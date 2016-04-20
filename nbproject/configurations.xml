@@ -13,6 +13,9 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>main.c</itemPath>
+      <itemPath>config.h</itemPath>
+      <itemPath>mux.h</itemPath>
+      <itemPath>mux.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
