@@ -16,7 +16,7 @@ typedef unsigned char   uint8_t;
 typedef uint8_t         byte;
 typedef unsigned int    mux_t;
 
-typedef enum pixel_t { BLANK=0, GREEN, RED, YELLOW };
+typedef enum { BLANK=0, GREEN, RED, YELLOW } pixel_t ;
 
 // 3-D pixel
 typedef struct {
@@ -24,6 +24,16 @@ typedef struct {
     byte y;
     byte z;
 } pixel3_t;
+
+typedef struct {
+    uint8_t reg_x;
+    uint8_t reg_y;
+} mux_parts_t;
+
+typedef union {
+    mux_t value;
+    mux_parts_t p;
+} mux_register_t;
 
 
 // Port shortcuts
