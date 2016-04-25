@@ -9,18 +9,30 @@
  
 #include <xc.h>
 #include "config.h"
+#include "mux.h"
 
-pixel_t cube[][][]= {  
+/**
+ Z-Y-X array holding the LED state 
+ */
+pixel_t cube[3][3][3]= {  
     {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}},
     {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}},
     {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}
 };
 
-void main(void) {
+void init_ports() {
+    ADCON1bits.VCFG0 = 0;   // Vref = Vdd
+    ADCON1bits.VCFG1 = 0;   // Vref- = Vss
+    ADCON1bits.PCFG = 0b1010;   // AN0-AN3 = analog in
+    
+    //ADCON0bits.CHS = 0x7;   // select AN0-AN3
+    ADCON2bits.ACQT = 0x04; // 6 Tads to charge C
+    ADCON2bits.ADCS = 0b110; // Fosc/64
+    
+    ADCON0bits.ADON = 1;    // turn on ADC
+    
     PORTA = 0x00; //Initial PORTA
     TRISA = 0xFF; //Define PORTA as input
-    ADCON1 = 0x0F; //Turn off ADcon
-    CMCON = 0x07; //Turn off Comparator
     PORTB = 0x00; //Initial PORTB
     TRISB = 0x00; //Define PORTB as output
     // TRISBbits.RB0 = 0; // SDI
@@ -28,6 +40,10 @@ void main(void) {
     TRISC = 0x00; //Define PORTC as output
     // OE
     PORTBbits.RB3 = 1;
+}
+
+void main(void) {
+    init_ports();
     
     
     return;
