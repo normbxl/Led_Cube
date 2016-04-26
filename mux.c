@@ -12,7 +12,7 @@ void mux_init() {
     __mux_shift_out(reg);
     P_OE_X=1;
     P_OE_Y=1;
-    
+    // fill the MUX-Reg-Translation LUT for one layer
     mux_lut[0][0].p.reg_x=1;
     mux_lut[0][0].p.reg_y=1;
     
@@ -42,8 +42,10 @@ void mux_init() {
     
 }
 
-void mux_set_output(mux_register_t reg_) {
-    mux_t reg = (mux_t)~reg_.p.reg_x + (mux_t)(reg_.p.reg_y << 8);
+void mux_show_layer(byte z) {
+    mux_register_t reg_struct = mux_get_mux_by_layer(z);
+   
+    mux_t reg = (mux_t)~reg_struct.p.reg_x + (mux_t)(reg_struct.p.reg_y << 8);
     P_OE_X=0;
     P_OE_Y=0;
     __mux_shift_out(reg);
@@ -51,7 +53,7 @@ void mux_set_output(mux_register_t reg_) {
     P_OE_Y=1;
 }
 
-void mux_set_input(byte reg_y) {
+void mux_set_y_for_input(byte reg_y) {
     mux_t reg = (mux_t)(reg_y << 8);
     P_OE_X=0;
     P_OE_Y=0;

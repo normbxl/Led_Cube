@@ -18,16 +18,16 @@ extern "C" {
     
     void mux_init();
     /**
-     * Sets output of X and Y port accordingly.
-     * X-Port is automatically inverted to controll the PNP transistors 
-     * @param register (non inverted)
-     */
-    void mux_set_output(mux_register_t reg_);
-    /**
      * Set MUX for input-readings, X-Ports are switched off, only Y-coords are needed
      * @param reg_y
      */
-    void mux_set_input(byte reg_y);
+    void mux_set_y_for_input(byte reg_y);
+    
+    /**
+     * outputs layer z by looking up set pixels in cube[][][]
+     * @param z 0..2 layer to show
+     */
+    void mux_show_layer(byte z);
     
     /**
      * private function to actually send stuff
