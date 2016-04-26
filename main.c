@@ -10,6 +10,7 @@
 #include <xc.h>
 #include "config.h"
 #include "mux.h"
+#include "fsm.c"
 
 /**
  Z-Y-X array holding the LED state 
@@ -45,6 +46,9 @@ void init_ports() {
 void main(void) {
     init_ports();
     
-    
+    while(1)
+    {
+        LED_Cube();
+    }
     return;
 }
