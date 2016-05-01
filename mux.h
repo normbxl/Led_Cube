@@ -29,13 +29,15 @@ extern "C" {
      */
     void mux_show_layer(byte z);
     
+    void mux_test_output(byte cycles);
+    
     /**
      * private function to actually send stuff
      * @param reg
      */
     void __mux_shift_out(mux_t reg);
     
-    mux_register_t mux_get_mux_by_layer(byte z);
+    mux_register_t mux_get_by_layer(byte z);
     
 
 #ifdef	__cplusplus

@@ -6,12 +6,10 @@ extern pixel_t cube[3][3][3];
 
 void mux_init() {
     mux_t reg=0;
-    P_OE_X=0;
-    P_OE_Y=0;
+    P_OE=0;
     
     __mux_shift_out(reg);
-    P_OE_X=1;
-    P_OE_Y=1;
+    P_OE=1;
     // fill the MUX-Reg-Translation LUT for one layer
     mux_lut[0][0].p.reg_x=1;
     mux_lut[0][0].p.reg_y=1;
@@ -43,25 +41,41 @@ void mux_init() {
 }
 
 void mux_show_layer(byte z) {
-    mux_register_t reg_struct = mux_get_mux_by_layer(z);
+    mux_register_t reg_struct = mux_get_by_layer(z);
    
     mux_t reg = (mux_t)~reg_struct.p.reg_x + (mux_t)(reg_struct.p.reg_y << 8);
-    P_OE_X=0;
-    P_OE_Y=0;
+    P_OE=0;
+    
     __mux_shift_out(reg);
-    P_OE_X=1;
-    P_OE_Y=1;
+    P_OE=1;
+    
 }
 
 void mux_set_y_for_input(byte reg_y) {
-    mux_t reg = (mux_t)(reg_y << 8);
-    P_OE_X=0;
-    P_OE_Y=0;
+    mux_t reg = (mux_t)(reg_y & 0xFF);
+    P_OE=0;
     __mux_shift_out(reg);
-    P_OE_Y=1;   
+    P_OE=1;
 }
 
-mux_register_t mux_get_mux_by_layer(byte z) {
+ void mux_test_output(byte cycles) {
+    byte c,z,x,y;
+    for (c=0; c<cycles; c++) {
+        for(z=0; z<3; z++) {
+            for (y=0; y<3; y++) {
+                for(x=0; x<3; x++) {
+                    cube[z][y][x]= (c%2==0) ? RED : GREEN;
+                    mux_show_layer(z);
+                    __delay_ms(20);
+                    __delay_ms(20);
+                    cube[z][y][x]= BLANK;
+                }
+            }
+        }
+    }
+ }
+
+mux_register_t mux_get_by_layer(byte z) {
     mux_register_t out;
     mux_register_t reg;
     out.value=0;
