@@ -1,3 +1,5 @@
+#include "fsm.h"
+
 /*********************************************************************
  *
  *                  EE 4 Project - Code Template
@@ -9,53 +11,8 @@
  * Updated:         17/02/2016
  ********************************************************************/
 
-/** I N C L U D E S *************************************************/
-#include "config.h"
-#include <stdbool.h>
-/** D E F I N E S ***************************************************/
-#define PUSHED 0
-
-
-
-bool LED_covered;
-bool three_in_a_row;
-bool LED_set;
-bool winner_determined;
-
-/** P R I V A T E   V A R I A B L E S *******************************/
-
-static enum 
+void fsm_init(void) 
 {
-    START_FSM,
-    BTN_DWN,
-    WAIT_FOR_LED_EVENT_FSM,
-    SET_CHOSEN_LED_FSM,
-    CHECK_3_IN_A_ROW_FSM, DETERMINE_WINNER_FSM, FLASH_WIN_FSM, RESET
-} current_state, state_to_recover;
-
-void init(void);
-void LED_Cube(void);
-
-
-/********************************************************************/
-/** P R I V A T E   D E C L A R A T I O N S *************************/
-
-/********************************************************************
- * Function:        void init(void)
- * PreCondition:    None
- * Input:           None
- * Output:          None
- * Overview:        Init is a centralize initialization routine.              
- *                  It will initialze all IO and variables, also the
- *                  hardware_init() for the hardware functions should
- *                  be called here.              
- ********************************************************************/
-void init(void) 
-{
-    //configure I/O
-    TRISCbits.TRISC1 = 1;
-
-
     current_state = START_FSM;
     state_to_recover = START_FSM;
 
@@ -73,7 +30,7 @@ void init(void)
  * Output:          None
  * Overview:        A simple FSM that will not work.          
  ********************************************************************/
-void LED_Cube(void) {
+void fsm_loop(void) {
 
     switch (current_state) 
     {
@@ -134,12 +91,12 @@ void LED_Cube(void) {
 
 
             // *** transitions ***
-            if (three_in_a_row = 0) 
+            if (three_in_a_row == 0) 
             {
                 current_state = WAIT_FOR_LED_EVENT_FSM;
             }
 
-            if (three_in_a_row = 1) 
+            if (three_in_a_row == 1) 
             {
                 current_state = DETERMINE_WINNER_FSM;
             }
@@ -151,7 +108,7 @@ void LED_Cube(void) {
 
 
             // *** transitions ***
-            if (winner_determined = 1) 
+            if (winner_determined == 1) 
             {
                 current_state = FLASH_WIN_FSM;
             }

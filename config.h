@@ -12,22 +12,29 @@
 extern "C" {
 #endif
 
-    #define _XTAL_FREQ 20000000
+#define _XTAL_FREQ 20000000
+
     
 typedef unsigned char   uint8_t;
 typedef uint8_t         byte;
 typedef unsigned int    mux_t;
+
 typedef enum {false=0, true} bool;
 
 
 typedef enum { BLANK=0, GREEN, RED, YELLOW } pixel_t ;
 
-// 3-D pixel
+// 3-D pixel, 2 bits per component is sufficent in a 3x3x3 world
 typedef struct {
-    byte x;
-    byte y;
-    byte z;
+    byte x  :2;
+    byte y  :3;
+    byte z  :3;
 } pixel3_t;
+
+typedef struct {
+    byte x  :4;
+    byte y  :4;
+} pixel2_t;
 
 typedef struct {
     uint8_t reg_x;

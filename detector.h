@@ -14,21 +14,18 @@
 extern "C" {
 #endif
 
+    #define DETECT_THRESHOLD 30.0
+
     float old_q[3][3][3];
     float old_v[3][3][3];
     
     const float ALPHA = 0.05;
     const float BETA = 0.5;
-    // save some RAM by combining bits
-    typedef struct {
-        uint8_t x   :4,
-                y   :4;
-    } point2d_t;
-    
-    point2d_t reverse_lut[] = {
-        {0,0}, {1,0}, {2,0},
-        {2,1}, {2,2}, {1,2},
-        {0,2}, {0,1}
+  
+    pixel2_t rev_lut[9] = {
+        {0, 0},{0, 1},{0, 2},
+        {1, 2},{2, 2},{2, 1},
+        {2, 0},{1, 0},{1, 1}
     };
     
     void detector_init();

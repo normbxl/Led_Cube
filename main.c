@@ -10,7 +10,7 @@
 #include <xc.h>
 #include "config.h"
 #include "mux.h"
-#include "fsm.c"
+#include "fsm.h"
 
 /**
  Z-Y-X array holding the LED state 
@@ -38,17 +38,19 @@ void init_ports() {
     TRISB = 0x00; //Define PORTB as output
     // TRISBbits.RB0 = 0; // SDI
     PORTC = 0x00; //Initial PORTC
-    TRISC = 0x00; //Define PORTC as output
+    TRISC = 0x02; //Define PORTC as output except C1
     // OE
     PORTBbits.RB3 = 1;
 }
 
 void main(void) {
     init_ports();
+    fsm_init();
+    
     
     while(1)
     {
-        LED_Cube();
+        fsm_loop();
     }
     return;
 }
