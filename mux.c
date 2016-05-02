@@ -2,7 +2,9 @@
 #include "mux.h"
 
 // cube[][][] is initialized in main.c
-extern pixel_t cube[3][3][3];
+extern color_t cube[3][3][3];
+
+
 
 void mux_init() {
     mux_t reg=0;
@@ -41,6 +43,8 @@ void mux_init() {
 }
 
 void mux_show_layer(byte z) {
+    // TODO: incoporate current player indicator
+    
     mux_register_t reg_struct = mux_get_by_layer(z);
    
     mux_t reg = (mux_t)~reg_struct.p.reg_x + (mux_t)(reg_struct.p.reg_y << 8);

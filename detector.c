@@ -5,10 +5,6 @@
 #include "detector.h"
 #include "mux.h"
 
-void detector_init(){
-   
-}
-
 bool detector_check(byte layer, pixel3_t *pos) {
     byte y, x, k;
     // TODO: check for center LEDs
@@ -33,7 +29,7 @@ bool detector_check(byte layer, pixel3_t *pos) {
             ADCON0bits.GO = 1;
 
             while (ADCON0bits.DONE == 0) {
-                // do something useful while waiting for the ADC to finish
+                // do something useful while waiting for the ADC 
                 k = (i<<1) + (r == 2 ? 8 : r);
             }
             x = rev_lut[k].x;
@@ -49,6 +45,6 @@ bool detector_check(byte layer, pixel3_t *pos) {
             }
         }
         gnd_mask = gnd_mask << 1;
-        return result;
     }
+    return result;
 }

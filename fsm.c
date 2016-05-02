@@ -10,17 +10,30 @@
  * Author:          MATHIAS YEAh!!!!!
  * Updated:         17/02/2016
  ********************************************************************/
+extern color_t cube[3][3][3];
 
-void fsm_init(void) 
-{
+void fsm_init(void) {
     current_state = START_FSM;
     state_to_recover = START_FSM;
 
-    LED_covered = 0;
-    three_in_a_row = 0;
-    LED_set = 0;
-    winner_determined = 0;
+    led_covered = false;
+    three_in_a_row = false;
+    LED_set = false;
+    winner_determined = false;
+    
+    current_player = GREEN;
+}
 
+bool fsm_is_end_of_game() {
+    bool result=true;
+    
+    for (byte i=0; i<27; i++) {
+        if ((color_t)(*(cube + i)) == BLANK) {
+            result = false;
+            break;
+        }
+    }
+    return result;
 }
 
 /********************************************************************
@@ -32,14 +45,12 @@ void fsm_init(void)
  ********************************************************************/
 void fsm_loop(void) {
 
-    switch (current_state) 
-    {
+    switch (current_state) {
         case START_FSM:
             // *** outputs ***
 
             // *** transitions ***
-            if (PORTCbits.RC1 == PUSHED) 
-            {
+            if (P_RESET == PUSHED) {
                 current_state = BTN_DWN;
             }
             break;
@@ -48,8 +59,7 @@ void fsm_loop(void) {
             // *** outputs ***
 
             // *** transitions ***
-            if (PORTCbits.RC1 != PUSHED) 
-            {
+            if (P_RESET != PUSHED) {
                 current_state = WAIT_FOR_LED_EVENT_FSM;
             }
             break;
@@ -57,47 +67,44 @@ void fsm_loop(void) {
         case WAIT_FOR_LED_EVENT_FSM:
             // *** outputs ***
 
-
             // *** transitions ***
-            if (PORTCbits.RC1 == PUSHED) 
-            {
+            if (P_RESET == PUSHED) {
                 current_state = RESET;
             }
 
-            if (LED_covered == 1) 
-            {
+            if (led_covered == true) {
                 current_state = SET_CHOSEN_LED_FSM;
             }
             break;
 
         case SET_CHOSEN_LED_FSM:
             // *** outputs ***
-
-
+            cube[sensed_pixel.z][sensed_pixel.y][sensed_pixel.x] = current_player;
+            
             // *** transitions ***
-            if (PORTCbits.RC1 == PUSHED) 
-            {
+
+            // RESET
+            if (P_RESET == PUSHED) {
                 current_state = RESET;
             }
 
-            if (LED_set == 1) 
-            {
+            if (LED_set == 1) {
                 current_state = CHECK_3_IN_A_ROW_FSM;
             }
             break;
 
         case CHECK_3_IN_A_ROW_FSM:
             // *** outputs ***
-
+            
+            // three_in_a_row = check_3_in_a_row();
 
             // *** transitions ***
-            if (three_in_a_row == 0) 
-            {
+            if (three_in_a_row == 0) {
+                current_player = current_player == GREEN ? RED : GREEN;
                 current_state = WAIT_FOR_LED_EVENT_FSM;
             }
 
-            if (three_in_a_row == 1) 
-            {
+            if (three_in_a_row == 1) {
                 current_state = DETERMINE_WINNER_FSM;
             }
             break;
@@ -108,9 +115,11 @@ void fsm_loop(void) {
 
 
             // *** transitions ***
-            if (winner_determined == 1) 
-            {
+            if (winner_determined == 1) {
                 current_state = FLASH_WIN_FSM;
+            }
+            else if (fsm_is_end_of_game()==true) {
+                // TODO: show draw animation
             }
             break;
 
@@ -126,8 +135,7 @@ void fsm_loop(void) {
             // *** outputs ***
 
             // *** transitions ***
-            if (PORTCbits.RC1 != PUSHED) 
-            {
+            if (P_RESET != PUSHED) {
                 current_state = START_FSM;
             }
             break;
@@ -136,6 +144,7 @@ void fsm_loop(void) {
             current_state = START_FSM;
             break;
     }
+
 
 }
 //EOF-------------------------------------------------------------------------

@@ -19,11 +19,13 @@ extern "C" {
 #define PUSHED 0
 
 
-
-bool LED_covered;
+bool led_covered;
+pixel3_t sensed_pixel;
 bool three_in_a_row;
 bool LED_set;
 bool winner_determined;
+
+color_t current_player;
 
 enum 
 {

@@ -28,7 +28,6 @@ extern "C" {
         {2, 0},{1, 0},{1, 1}
     };
     
-    void detector_init();
     bool detector_check(byte layer, pixel3_t *pos);
     
 
