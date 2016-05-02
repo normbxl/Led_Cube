@@ -5,6 +5,7 @@
 #include "detector.h"
 #include "mux.h"
 
+
 void detector_init(){
    
 }

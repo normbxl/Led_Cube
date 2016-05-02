@@ -4,6 +4,7 @@
  *
  * Created on 20. April 2016, 12:37
  */
+#include <stdbool.h>
 
 #ifndef CONFIG_H
 #define	CONFIG_H
@@ -19,7 +20,7 @@ typedef unsigned char   uint8_t;
 typedef uint8_t         byte;
 typedef unsigned int    mux_t;
 
-typedef enum {false=0, true} bool;
+//typedef enum {false=0, true} bool;
 
 
 typedef enum { BLANK=0, GREEN, RED, YELLOW } pixel_t ;

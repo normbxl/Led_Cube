@@ -43,6 +43,17 @@ void init_ports() {
     PORTBbits.RB3 = 1;
 }
 
+void init_timer() {
+    T0CONbits.T08BIT=1; // 8 bit counter
+    T0CONbits.T0PS=0x7  // prescaler 256 
+}
+
+void interrupt ISR() {
+    
+    
+    
+}
+
 void main(void) {
     init_ports();
     fsm_init();
