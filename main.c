@@ -23,7 +23,7 @@ color_t cube[3][3][3]= {
     {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}
 };
 
-
+volatile time_t __time = 0;
 
 void init_ports() {
     ADCON1bits.VCFG0 = 0;   // Vref = Vdd
@@ -31,7 +31,7 @@ void init_ports() {
     ADCON1bits.PCFG = 0b1010;   // AN0-AN3 = analog in
     
     //ADCON0bits.CHS = 0x7;   // select AN0-AN3
-    ADCON2bits.ACQT = 0x04; // 6 Tads to charge C
+    ADCON2bits.ACQT = 0x07; // 20 Tads to charge C
     ADCON2bits.ADCS = 0b110; // Fosc/64
     
     ADCON0bits.ADON = 1;    // turn on ADC
@@ -42,7 +42,7 @@ void init_ports() {
     TRISB = 0x00; //Define PORTB as output
     // TRISBbits.RB0 = 0; // SDI
     PORTC = 0x00; //Initial PORTC
-    TRISC = 0x02; //Define PORTC as output except C1
+    TRISC = 0x3 ; //Define PORTC as output except RC0 + RC1
     // OE
     PORTBbits.RB3 = 1;
 }
@@ -63,8 +63,6 @@ void init_timer() {
     
     INTCONbits.PEIE = 1;    // enable peripherical interrupts
     INTCONbits.GIE = 1;     // enable interrupts
-    
-    
 }
 
 void interrupt ISR() {
@@ -90,10 +88,48 @@ void interrupt ISR() {
     }
 }
 
+void test_main() {
+    bool pDown = false;
+    byte c=0;
+    
+    color_t col = RED;
+    cube[0][0][0] = col;
+    
+    while (1) {
+        if (P_RESET==0) {
+            mux_test_output(1);
+            wait(2000);
+        }
+        continue;
+        /*
+        PORTCbits.RC2 = P_RESET;
+        if (P_RESET == 1 && !pDown) {
+            pDown=true;
+            //pDown_ts=get_time();
+        }
+        // on release
+        else if (P_RESET == 0 && pDown) {
+            if (++c==27) {
+                col++;
+                c=0;
+            }
+            else {
+                cube[c/9][(c/3)%3][c%3] = col;
+                mux_show_layer(c/9);
+            }
+            pDown = false;
+        }
+        */
+    }
+    
+}
+
 void main(void) {
     init_ports();
     fsm_init();
     init_timer();
+    
+    test_main();
     
     while(1)
     {
@@ -111,5 +147,5 @@ void main(void) {
             tmr_signal.busy=false;
         }
     }
-    return;
+    
 }

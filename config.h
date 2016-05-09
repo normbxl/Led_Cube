@@ -24,7 +24,7 @@ extern "C" {
     
 #define P_OE  PORTBbits.RB2     // output-enable X-lines (G-R)
 #define P_OE_Y  PORTBbits.RB3   // output-enable Y-lines (GND)
-#define P_RESET PORTCbits.RC1   // RESET
+#define P_RESET PORTCbits.RC0   // RESET
 
     
 typedef unsigned char   uint8_t;

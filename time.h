@@ -13,11 +13,12 @@
 extern "C" {
 #endif
 
-volatile unsigned long __time = 0;
+    typedef unsigned long time_t;
+extern volatile time_t __time;
 
-unsigned long get_time();
+time_t get_time();
 
-void wait(unsigned long t);
+void wait(time_t t);
 
 
 #ifdef	__cplusplus

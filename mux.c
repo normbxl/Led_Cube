@@ -1,6 +1,6 @@
 #include <xc.h>
 #include "mux.h"
-
+#include "time.h"
 // cube[][][] is initialized in main.c
 extern color_t cube[3][3][3];
 
@@ -12,6 +12,7 @@ void mux_init() {
     
     __mux_shift_out(reg);
     P_OE=1;
+    P_OE_Y = 1;
     // fill the MUX-Reg-Translation LUT for one layer
     mux_lut[0][0].p.reg_x=1;
     mux_lut[0][0].p.reg_y=1;
@@ -70,8 +71,7 @@ void mux_set_y_for_input(byte reg_y) {
                 for(x=0; x<3; x++) {
                     cube[z][y][x]= (c%2==0) ? RED : GREEN;
                     mux_show_layer(z);
-                    __delay_ms(20);
-                    __delay_ms(20);
+                    wait(200);
                     cube[z][y][x]= BLANK;
                 }
             }
