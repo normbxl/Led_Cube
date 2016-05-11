@@ -93,8 +93,8 @@ mux_register_t mux_get_by_layer(byte z) {
                 w_reg.value = 0;
                 // TODO: change for correct layout
                 if (x==1 && y==1 && z>0) {
-                    w_reg.p.reg_x = 1 << (cube[z][y][x]==RED ? 1 : 5);
-                    w_reg.p.reg_y = 1 << (z==1 ? 6 : 7);
+                    w_reg.p.reg_x = 1 << (cube[z][y][x]==RED ? 2 : 6);
+                    w_reg.p.reg_y = 1 << (z==1 ? 1 : 0);
                 }
                 else {
                     switch (cube[z][y][x]) {
@@ -108,7 +108,7 @@ mux_register_t mux_get_by_layer(byte z) {
                             w_reg.p.reg_x = mux_lut[y][x].p.reg_x | (mux_lut[y][x].p.reg_x << 4);
                             break;
                     }
-                    w_reg.p.reg_y = mux_lut[y][x].p.reg_y >> z_shift;
+                    w_reg.p.reg_y = mux_lut[y][x].p.reg_y << z_shift;
                 }
                 out.value |= w_reg.value;
             }

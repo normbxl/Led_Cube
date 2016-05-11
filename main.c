@@ -139,7 +139,7 @@ void test_main() {
 void main(void) {
     init_ports();
     //fsm_init();
-    //init_timer();
+    init_timer();
     mux_init();
     test_main();
     
