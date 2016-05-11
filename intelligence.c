@@ -12,11 +12,10 @@ color_t three_in_a_row_check() {
                     if (cube[z][y][0] == cube[z][y][1] && cube[z][y][0] == cube[z][y][2])
                     {
                         result = cube[z][y][0];
+                        return result;
                     }
                 }
-                continue;
             }
-
         }
     }
     for (z = 0; z < 3; z++) {
@@ -26,13 +25,15 @@ color_t three_in_a_row_check() {
                     if (cube[z][0][x] == cube[z][1][x] && cube[z][0][x] == cube[z][2][x])
                     {
                         result = cube[z][0][x];
+                        return result;
                     }
                     if (cube[0][y][x] == cube[1][y][x] && cube[0][y][x] == cube[2][y][x])
                     {
                         result = cube[0][y][x];
+                        return result;
                     }
                 }
-                continue;
+                
             }
 
         }

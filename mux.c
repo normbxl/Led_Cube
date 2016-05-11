@@ -15,32 +15,92 @@ void mux_init() {
     P_OE_Y = 1;
     // fill the MUX-Reg-Translation LUT for one layer
     // 1
-    mux_lut[0][0].p.reg_x=1<<3;
-    mux_lut[0][0].p.reg_y=1<<7;
+    mux_lut[0][0][0].p.reg_x=1<<3;
+    mux_lut[0][0][0].p.reg_y=1<<7;
     // 2
-    mux_lut[0][1].p.reg_x=1<<3;
-    mux_lut[0][1].p.reg_y=1<<6;
+    mux_lut[0][0][1].p.reg_x=1<<3;
+    mux_lut[0][0][1].p.reg_y=1<<6;
     // 3
-    mux_lut[0][2].p.reg_x=1<<2;
-    mux_lut[0][2].p.reg_y=1<<7;
+    mux_lut[0][0][2].p.reg_x=1<<2;
+    mux_lut[0][0][2].p.reg_y=1<<7;
     // 4
-    mux_lut[1][2].p.reg_x=1<<2;
-    mux_lut[1][2].p.reg_y=1<<6;
+    mux_lut[0][1][2].p.reg_x=1<<2;
+    mux_lut[0][1][2].p.reg_y=1<<6;
     // 5
-    mux_lut[2][2].p.reg_x=1<<1;
-    mux_lut[2][2].p.reg_y=1<<7;
+    mux_lut[0][2][2].p.reg_x=1<<1;
+    mux_lut[0][2][2].p.reg_y=1<<7;
     // 6
-    mux_lut[2][1].p.reg_x=1<<1;
-    mux_lut[2][1].p.reg_y=1<<6;
+    mux_lut[0][2][1].p.reg_x=1<<1;
+    mux_lut[0][2][1].p.reg_y=1<<6;
     // 7
-    mux_lut[2][0].p.reg_x=1;
-    mux_lut[2][0].p.reg_y=1<<7;
+    mux_lut[0][2][0].p.reg_x=1;
+    mux_lut[0][2][0].p.reg_y=1<<7;
     // 8
-    mux_lut[1][0].p.reg_x=1;
-    mux_lut[1][0].p.reg_y=1<<6;
+    mux_lut[0][1][0].p.reg_x=1;
+    mux_lut[0][1][0].p.reg_y=1<<6;
     // 25
-    mux_lut[1][1].p.reg_x=1<<3;
-    mux_lut[1][1].p.reg_y=1<<1;
+    mux_lut[0][1][1].p.reg_x=1<<3;
+    mux_lut[0][1][1].p.reg_y=1<<1;
+    
+    // Layer 2
+    
+    // 9
+    mux_lut[1][0][0].p.reg_x=1<<3;
+    mux_lut[1][0][0].p.reg_y=1<<5;
+    // 10
+    mux_lut[1][0][1].p.reg_x=1<<1;
+    mux_lut[1][0][1].p.reg_y=1<<4;
+    // 11
+    mux_lut[1][0][2].p.reg_x=1<<2;
+    mux_lut[1][0][2].p.reg_y=1<<5;
+    // 12
+    mux_lut[1][1][2].p.reg_x=1;
+    mux_lut[1][1][2].p.reg_y=1<<5;
+    // 13
+    mux_lut[1][2][2].p.reg_x=1;
+    mux_lut[1][2][2].p.reg_y=1<<4;
+    // 14
+    mux_lut[1][2][1].p.reg_x=1<<2;
+    mux_lut[1][2][1].p.reg_y=1<<4;
+    // 15
+    mux_lut[1][2][0].p.reg_x=1<<1;
+    mux_lut[1][2][0].p.reg_y=1<<4;
+    // 16
+    mux_lut[1][1][0].p.reg_x=1<<3;
+    mux_lut[1][1][0].p.reg_y=1<<4;
+    // 26
+    mux_lut[1][1][1].p.reg_x=1<<2;
+    mux_lut[1][1][1].p.reg_y=1<<1;
+    
+    // Layer 2
+    
+    // 17
+    mux_lut[2][0][0].p.reg_x=1<<3;
+    mux_lut[2][0][0].p.reg_y=1<<3;
+    // 18
+    mux_lut[2][0][1].p.reg_x=1<<1;
+    mux_lut[2][0][1].p.reg_y=1<<2;
+    // 19
+    mux_lut[2][0][2].p.reg_x=1<<2;
+    mux_lut[2][0][2].p.reg_y=1<<3;
+    // 20
+    mux_lut[2][1][2].p.reg_x=1;
+    mux_lut[2][1][2].p.reg_y=1<<2;
+    // 21
+    mux_lut[2][2][2].p.reg_x=1;
+    mux_lut[2][2][2].p.reg_y=1<<2;
+    // 22
+    mux_lut[2][2][1].p.reg_x=1<<2;
+    mux_lut[2][2][1].p.reg_y=1<<2;
+    // 23
+    mux_lut[2][2][0].p.reg_x=1<<1;
+    mux_lut[2][2][0].p.reg_y=1<<2;
+    // 24
+    mux_lut[2][1][0].p.reg_x=1<<3;
+    mux_lut[2][1][0].p.reg_y=1<<2;
+    // 27
+    mux_lut[2][1][1].p.reg_x=1<<2;
+    mux_lut[2][1][1].p.reg_y=1;
     
 }
 
@@ -86,30 +146,28 @@ mux_register_t mux_get_by_layer(byte z) {
     mux_register_t out;
     mux_register_t w_reg;
     out.value=0;
-    byte z_shift = z*2;
     for (byte y=0; y<3; y++) {
         for (byte x=0; x<3; x++) {
             if (cube[z][y][x] != BLANK) {
                 w_reg.value = 0;
-                // TODO: change for correct layout
-                if (x==1 && y==1 && z>0) {
+                /*if (x==1 && y==1 && z>0) {
                     w_reg.p.reg_x = 1 << (cube[z][y][x]==RED ? 2 : 6);
                     w_reg.p.reg_y = 1 << (z==1 ? 1 : 0);
+                 */ 
+                
+                switch (cube[z][y][x]) {
+                    case GREEN:
+                        w_reg.p.reg_x = mux_lut[z][y][x].p.reg_x << 4;
+                        break;
+                    case RED:
+                        w_reg.p.reg_x = mux_lut[z][y][x].p.reg_x;
+                        break;
+                    case YELLOW:
+                        w_reg.p.reg_x = mux_lut[z][y][x].p.reg_x | (mux_lut[z][y][x].p.reg_x << 4);
+                        break;
                 }
-                else {
-                    switch (cube[z][y][x]) {
-                        case GREEN:
-                            w_reg.p.reg_x = mux_lut[y][x].p.reg_x << 4;
-                            break;
-                        case RED:
-                            w_reg.p.reg_x = mux_lut[y][x].p.reg_x;
-                            break;
-                        case YELLOW:
-                            w_reg.p.reg_x = mux_lut[y][x].p.reg_x | (mux_lut[y][x].p.reg_x << 4);
-                            break;
-                    }
-                    w_reg.p.reg_y = mux_lut[y][x].p.reg_y << z_shift;
-                }
+                w_reg.p.reg_y = mux_lut[z][y][x].p.reg_y;
+
                 out.value |= w_reg.value;
             }
         }

@@ -14,7 +14,7 @@ extern "C" {
 
 #include "config.h"
     
-    mux_register_t mux_lut[3][3];
+    mux_register_t mux_lut[3][3][3];
     
     void mux_init();
     /**

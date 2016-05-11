@@ -23,7 +23,7 @@ color_t cube[3][3][3]= {
     {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}
 };
 
-volatile time_t __time = 0;
+volatile time_t time__ = 0;
 
 void init_ports() {
     ADCON1bits.VCFG0 = 0;   // Vref = Vdd
@@ -83,7 +83,7 @@ void interrupt ISR() {
         INTCONbits.TMR0IF = 0;  // clear TMR0 interrupt flag
     }
     if (PIR1bits.TMR2IF == 1) {
-        __time++;
+        time__++;
         PIR1bits.TMR2IF = 0;
     }
 }
@@ -95,15 +95,15 @@ void test_main() {
     
     color_t col = GREEN;
 
-    mux_register_t reg_struct;
+    //mux_register_t reg_struct;
     while (1) {
         PORTCbits.RC2 = P_RESET;
         if (P_RESET == 0 && !pDown) {
             pDown=true;
-            pDown_ts=get_time();
+            pDown_ts=TIME;
         }
         // on release
-        else if ( (P_RESET == 1 && pDown && pDown_ts + 1000 > get_time())) {
+        else if ( P_RESET == 1 && pDown && pDown_ts + 1000 > TIME ) {
            
             
             //mux_test_output(2);
@@ -138,7 +138,7 @@ void test_main() {
 
 void main(void) {
     init_ports();
-    //fsm_init();
+    fsm_init();
     init_timer();
     mux_init();
     test_main();

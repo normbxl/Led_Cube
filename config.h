@@ -5,6 +5,7 @@
  * Created on 20. April 2016, 12:37
  */
 #include <stdbool.h>
+#include <xc.h>
 
 #ifndef CONFIG_H
 #define	CONFIG_H

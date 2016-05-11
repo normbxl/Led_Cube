@@ -31,7 +31,7 @@ bool fsm_is_end_of_game() {
     bool result=true;
     
     for (byte i=0; i<27; i++) {
-        if ((color_t)(*(cube + i)) == BLANK) {
+        if ((color_t)(*((color_t*)cube + i)) == BLANK) {
             result = false;
             break;
         }

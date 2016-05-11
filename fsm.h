@@ -36,6 +36,8 @@ enum
     CHECK_3_IN_A_ROW_FSM, DETERMINE_WINNER_FSM, FLASH_WIN_FSM, RESET
 } current_state, state_to_recover;
 
+void fsm_init();
+void fsm_loop(void);
 
 #ifdef	__cplusplus
 }
