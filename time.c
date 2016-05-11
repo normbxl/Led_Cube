@@ -1,5 +1,5 @@
 #include "time.h"
-#include <xc.h>
+#include <pic18.h>
 
 extern volatile time_t time__;
 
@@ -10,6 +10,6 @@ time_t time() {
 void wait(time_t t) {
     time_t o = time__;
     while (o+t > time__) {
-        NOP();
+        __nop();
     }
 }

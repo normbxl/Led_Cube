@@ -14,6 +14,8 @@
 extern color_t cube[3][3][3];
 color_t winner_color;
 
+
+
 void fsm_init() {
     current_state = START_FSM;
     state_to_recover = START_FSM;

@@ -56,8 +56,8 @@ void init_timer() {
     T0CONbits.TMR0ON = 1;   // Timer0 On
     
     T2CONbits.T2CKPS = 0x2;  // Timer2 PS 16x
-    T2CONbits.TOUTPS = 0;   // No post scaler
-    PR2 = 74;               // compare value for Timer2 Interrupt
+    T2CONbits.TOUTPS = 0x4;   // 4x post scaler
+    PR2 = 187;               // compare value for Timer2 Interrupt
     T2CONbits.TMR2ON = 1;   // Timer 2 On
     PIE1bits.TMR2IE = 1;    // Timer 2 interrupt enable
     
@@ -91,7 +91,7 @@ void interrupt ISR() {
 void test_main() {
     bool pDown = false;
     time_t pDown_ts;
-    byte c=0;
+    byte c=9;
     
     color_t col = GREEN;
 
@@ -103,7 +103,7 @@ void test_main() {
             pDown_ts=TIME;
         }
         // on release
-        else if ( P_RESET == 1 && pDown && pDown_ts + 1000 > TIME ) {
+        else if ( P_RESET == 1 && pDown && pDown_ts + 100 < TIME ) {
            
             
             //mux_test_output(2);
@@ -141,8 +141,9 @@ void main(void) {
     fsm_init();
     init_timer();
     mux_init();
+    mux_test_output(5);
     test_main();
-    
+    /*
     while(1)
     {
         fsm_loop();
@@ -159,5 +160,5 @@ void main(void) {
             tmr_signal.busy=false;
         }
     }
-    
+    */
 }

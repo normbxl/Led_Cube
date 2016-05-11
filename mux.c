@@ -48,23 +48,23 @@ void mux_init() {
     mux_lut[1][0][0].p.reg_x=1<<3;
     mux_lut[1][0][0].p.reg_y=1<<5;
     // 10
-    mux_lut[1][0][1].p.reg_x=1<<1;
+    mux_lut[1][0][1].p.reg_x=1<<2; 
     mux_lut[1][0][1].p.reg_y=1<<4;
     // 11
     mux_lut[1][0][2].p.reg_x=1<<2;
     mux_lut[1][0][2].p.reg_y=1<<5;
     // 12
-    mux_lut[1][1][2].p.reg_x=1;
-    mux_lut[1][1][2].p.reg_y=1<<5;
+    mux_lut[1][1][2].p.reg_x=1<<1;
+    mux_lut[1][1][2].p.reg_y=1<<4;
     // 13
-    mux_lut[1][2][2].p.reg_x=1;
-    mux_lut[1][2][2].p.reg_y=1<<4;
+    mux_lut[1][2][2].p.reg_x=1<<1;
+    mux_lut[1][2][2].p.reg_y=1<<5;
     // 14
-    mux_lut[1][2][1].p.reg_x=1<<2;
+    mux_lut[1][2][1].p.reg_x=1<<0;
     mux_lut[1][2][1].p.reg_y=1<<4;
     // 15
-    mux_lut[1][2][0].p.reg_x=1<<1;
-    mux_lut[1][2][0].p.reg_y=1<<4;
+    mux_lut[1][2][0].p.reg_x=1<<0;
+    mux_lut[1][2][0].p.reg_y=1<<5;
     // 16
     mux_lut[1][1][0].p.reg_x=1<<3;
     mux_lut[1][1][0].p.reg_y=1<<4;
@@ -72,35 +72,35 @@ void mux_init() {
     mux_lut[1][1][1].p.reg_x=1<<2;
     mux_lut[1][1][1].p.reg_y=1<<1;
     
-    // Layer 2
+    // Layer 3
     
     // 17
     mux_lut[2][0][0].p.reg_x=1<<3;
     mux_lut[2][0][0].p.reg_y=1<<3;
     // 18
-    mux_lut[2][0][1].p.reg_x=1<<1;
+    mux_lut[2][0][1].p.reg_x=1<<2; 
     mux_lut[2][0][1].p.reg_y=1<<2;
     // 19
     mux_lut[2][0][2].p.reg_x=1<<2;
     mux_lut[2][0][2].p.reg_y=1<<3;
     // 20
-    mux_lut[2][1][2].p.reg_x=1;
+    mux_lut[2][1][2].p.reg_x=1<<1;
     mux_lut[2][1][2].p.reg_y=1<<2;
     // 21
-    mux_lut[2][2][2].p.reg_x=1;
-    mux_lut[2][2][2].p.reg_y=1<<2;
+    mux_lut[2][2][2].p.reg_x=1<<1;
+    mux_lut[2][2][2].p.reg_y=1<<3;
     // 22
-    mux_lut[2][2][1].p.reg_x=1<<2;
+    mux_lut[2][2][1].p.reg_x=1<<0;
     mux_lut[2][2][1].p.reg_y=1<<2;
     // 23
-    mux_lut[2][2][0].p.reg_x=1<<1;
-    mux_lut[2][2][0].p.reg_y=1<<2;
+    mux_lut[2][2][0].p.reg_x=1<<0;
+    mux_lut[2][2][0].p.reg_y=1<<3;
     // 24
     mux_lut[2][1][0].p.reg_x=1<<3;
     mux_lut[2][1][0].p.reg_y=1<<2;
-    // 27
+    // 25
     mux_lut[2][1][1].p.reg_x=1<<2;
-    mux_lut[2][1][1].p.reg_y=1;
+    mux_lut[2][1][1].p.reg_y=1<<0;
     
 }
 
@@ -133,12 +133,11 @@ void mux_set_y_for_input(byte reg_y) {
                 for(x=0; x<3; x++) {
                     cube[z][y][x]= (c%2==0) ? RED : GREEN;
                     mux_show_layer(z);
-                    wait(5000);
-                    //cube[z][y][x]= BLANK;
+                    wait(150);
+                    cube[z][y][x]= BLANK;
                 }
             }
         }
-        wait(50000);
     }
  }
 
