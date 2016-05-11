@@ -9,37 +9,38 @@ extern color_t cube[3][3][3];
 void mux_init() {
     mux_t reg=0;
     P_OE=0;
-    
+    P_OE_Y = 0;
     __mux_shift_out(reg);
     P_OE=1;
     P_OE_Y = 1;
     // fill the MUX-Reg-Translation LUT for one layer
-    mux_lut[0][0].p.reg_x=1;
-    mux_lut[0][0].p.reg_y=1;
-    
-    mux_lut[0][1].p.reg_x=1;
-    mux_lut[0][1].p.reg_y=1<<1;
-    
-    mux_lut[0][2].p.reg_x=1<<1;
-    mux_lut[0][2].p.reg_y=1;
-    
-    mux_lut[1][0].p.reg_x=1<<3;
-    mux_lut[1][0].p.reg_y=1<<1;
-    
-    mux_lut[1][1].p.reg_x=1;
-    mux_lut[1][1].p.reg_y=1<<6;
-    
-    mux_lut[1][2].p.reg_x=1<<1;
-    mux_lut[1][2].p.reg_y=1<<1;
-    
-    mux_lut[2][0].p.reg_x=1<<3;
-    mux_lut[2][0].p.reg_y=1;
-    
-    mux_lut[2][1].p.reg_x=1<<2;
-    mux_lut[2][1].p.reg_y=1<<1;
-    
-    mux_lut[2][2].p.reg_x=1<<2;
-    mux_lut[2][2].p.reg_y=1<<0;
+    // 1
+    mux_lut[0][0].p.reg_x=1<<3;
+    mux_lut[0][0].p.reg_y=1<<7;
+    // 2
+    mux_lut[0][1].p.reg_x=1<<3;
+    mux_lut[0][1].p.reg_y=1<<6;
+    // 3
+    mux_lut[0][2].p.reg_x=1<<2;
+    mux_lut[0][2].p.reg_y=1<<7;
+    // 4
+    mux_lut[1][2].p.reg_x=1<<2;
+    mux_lut[1][2].p.reg_y=1<<6;
+    // 5
+    mux_lut[2][2].p.reg_x=1<<1;
+    mux_lut[2][2].p.reg_y=1<<7;
+    // 6
+    mux_lut[2][1].p.reg_x=1<<1;
+    mux_lut[2][1].p.reg_y=1<<6;
+    // 7
+    mux_lut[2][0].p.reg_x=1;
+    mux_lut[2][0].p.reg_y=1<<7;
+    // 8
+    mux_lut[1][0].p.reg_x=1;
+    mux_lut[1][0].p.reg_y=1<<6;
+    // 25
+    mux_lut[1][1].p.reg_x=1<<3;
+    mux_lut[1][1].p.reg_y=1<<1;
     
 }
 
@@ -47,12 +48,13 @@ void mux_show_layer(byte z) {
     // TODO: incoporate current player indicator
     
     mux_register_t reg_struct = mux_get_by_layer(z);
-   
-    mux_t reg = (mux_t)~reg_struct.p.reg_x + (mux_t)(reg_struct.p.reg_y << 8);
-    P_OE=0;
+    reg_struct.p.reg_x = ~reg_struct.p.reg_x;
     
-    __mux_shift_out(reg);
+    P_OE=0;
+    P_OE_Y=0;
+    __mux_shift_out(reg_struct.value);
     P_OE=1;
+    P_OE_Y=1;
     
 }
 
@@ -71,42 +73,44 @@ void mux_set_y_for_input(byte reg_y) {
                 for(x=0; x<3; x++) {
                     cube[z][y][x]= (c%2==0) ? RED : GREEN;
                     mux_show_layer(z);
-                    wait(200);
-                    cube[z][y][x]= BLANK;
+                    wait(5000);
+                    //cube[z][y][x]= BLANK;
                 }
             }
         }
+        wait(50000);
     }
  }
 
 mux_register_t mux_get_by_layer(byte z) {
     mux_register_t out;
-    mux_register_t reg;
+    mux_register_t w_reg;
     out.value=0;
     byte z_shift = z*2;
     for (byte y=0; y<3; y++) {
         for (byte x=0; x<3; x++) {
             if (cube[z][y][x] != BLANK) {
-                reg.value = 0;
+                w_reg.value = 0;
+                // TODO: change for correct layout
                 if (x==1 && y==1 && z>0) {
-                    reg.p.reg_x = 1 << (cube[z][y][x]==RED ? 1 : 5);
-                    reg.p.reg_y = 1 << (z==1 ? 6 : 7);
+                    w_reg.p.reg_x = 1 << (cube[z][y][x]==RED ? 1 : 5);
+                    w_reg.p.reg_y = 1 << (z==1 ? 6 : 7);
                 }
                 else {
                     switch (cube[z][y][x]) {
                         case GREEN:
-                            reg.p.reg_x = mux_lut[y][x].p.reg_x;
+                            w_reg.p.reg_x = mux_lut[y][x].p.reg_x << 4;
                             break;
                         case RED:
-                            reg.p.reg_x = mux_lut[y][x].p.reg_x << 4;
+                            w_reg.p.reg_x = mux_lut[y][x].p.reg_x;
                             break;
                         case YELLOW:
-                            reg.p.reg_x = mux_lut[y][x].p.reg_x + (mux_lut[y][x].p.reg_x << 4);
+                            w_reg.p.reg_x = mux_lut[y][x].p.reg_x | (mux_lut[y][x].p.reg_x << 4);
                             break;
                     }
-                    reg.p.reg_y = mux_lut[y][x].p.reg_y << z_shift;
+                    w_reg.p.reg_y = mux_lut[y][x].p.reg_y >> z_shift;
                 }
-                out.value += reg.value;
+                out.value |= w_reg.value;
             }
         }
     }
@@ -118,7 +122,8 @@ void __mux_shift_out(mux_t reg) {
     P_CLK = 0;
     // strobe
     P_STR = 0;
-    for (uint8_t i = 0; i<16; i++) {
+    P_DAT = 0;
+    for (byte i = 0; i<16; i++) {
         // data
         P_DAT = (reg >> i) & 0x01;
         if (i==15) {
@@ -127,8 +132,11 @@ void __mux_shift_out(mux_t reg) {
         }
         //clock impulse
         P_CLK = 1;
-        __nop();
+        __delay_us(10);
         P_CLK = 0;
+        __delay_us(10);
+        
+        P_DAT = 0;
     }
     // strobe
     P_STR = 0;

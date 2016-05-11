@@ -1,4 +1,5 @@
 #include "fsm.h"
+#include "intelligence.h"
 
 /*********************************************************************
  *
@@ -11,8 +12,9 @@
  * Updated:         17/02/2016
  ********************************************************************/
 extern color_t cube[3][3][3];
+color_t winner_color;
 
-void fsm_init(void) {
+void fsm_init() {
     current_state = START_FSM;
     state_to_recover = START_FSM;
 
@@ -20,6 +22,7 @@ void fsm_init(void) {
     three_in_a_row = false;
     LED_set = false;
     winner_determined = false;
+    winner_color = BLANK;
     
     current_player = GREEN;
 }
@@ -96,15 +99,14 @@ void fsm_loop(void) {
         case CHECK_3_IN_A_ROW_FSM:
             // *** outputs ***
             
-            // three_in_a_row = check_3_in_a_row();
-
+            winner_color = three_in_a_row_check();
+            
             // *** transitions ***
-            if (three_in_a_row == 0) {
+            if (winner_color == BLANK) {
                 current_player = current_player == GREEN ? RED : GREEN;
                 current_state = WAIT_FOR_LED_EVENT_FSM;
             }
-
-            if (three_in_a_row == 1) {
+            else {
                 current_state = DETERMINE_WINNER_FSM;
             }
             break;

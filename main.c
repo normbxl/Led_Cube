@@ -90,45 +90,57 @@ void interrupt ISR() {
 
 void test_main() {
     bool pDown = false;
+    time_t pDown_ts;
     byte c=0;
     
-    color_t col = RED;
-    cube[0][0][0] = col;
-    
+    color_t col = GREEN;
+
+    mux_register_t reg_struct;
     while (1) {
-        if (P_RESET==0) {
-            mux_test_output(1);
-            wait(2000);
-        }
-        continue;
-        /*
         PORTCbits.RC2 = P_RESET;
-        if (P_RESET == 1 && !pDown) {
+        if (P_RESET == 0 && !pDown) {
             pDown=true;
-            //pDown_ts=get_time();
+            pDown_ts=get_time();
         }
         // on release
-        else if (P_RESET == 0 && pDown) {
-            if (++c==27) {
-                col++;
+        else if ( (P_RESET == 1 && pDown && pDown_ts + 1000 > get_time())) {
+           
+            
+            //mux_test_output(2);
+            //for (byte i=0; i<27; i++) {
+            //    *((color_t*)cube + i) = BLANK;
+            //}
+            
+            if (c==27) {
+                col= col==RED ? GREEN : RED;
                 c=0;
             }
-            else {
-                cube[c/9][(c/3)%3][c%3] = col;
-                mux_show_layer(c/9);
+            
+            if (c>0) {
+                byte d=c-1;
+                cube[d/9][(d/3)%3][d%3] = BLANK;
+                //*((color_t*)cube + c-1) = BLANK;
             }
-            pDown = false;
+            //*((color_t*)cube + c) = col;
+            cube[c/9][(c/3)%3][c%3] = col;
+            mux_show_layer(c/9);    
+            
+            c++;
         }
-        */
+        if (P_RESET==1) {
+            pDown=false;
+        }
     }
     
 }
 
+
+
 void main(void) {
     init_ports();
-    fsm_init();
-    init_timer();
-    
+    //fsm_init();
+    //init_timer();
+    mux_init();
     test_main();
     
     while(1)
