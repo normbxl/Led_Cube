@@ -14,7 +14,7 @@
 extern color_t cube[3][3][3];
 color_t winner_color;
 
-
+color_t current_player;
 
 void fsm_init() {
     current_state = START_FSM;
@@ -46,7 +46,7 @@ bool fsm_is_end_of_game() {
  * PreCondition:    None
  * Input:           None
  * Output:          None
- * Overview:        A simple FSM that will not work.          
+ * Overview:        A simple FSM that will not yet work.          
  ********************************************************************/
 void fsm_loop(void) {
 

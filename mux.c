@@ -4,7 +4,7 @@
 // cube[][][] is initialized in main.c
 extern color_t cube[3][3][3];
 
-
+extern color_t current_player;
 
 void mux_init() {
     mux_t reg=0;
@@ -105,9 +105,15 @@ void mux_init() {
 }
 
 void mux_show_layer(byte z) {
-    // TODO: incoporate current player indicator
     
     mux_register_t reg_struct = mux_get_by_layer(z);
+    
+    // add current player indication
+    if (z==0) {
+        reg_struct.p.reg_x |= (current_player == RED ? 0x2 : 0x20);
+        reg_struct.p.reg_y |= 0x2;
+    }
+    
     reg_struct.p.reg_x = ~reg_struct.p.reg_x;
     
     P_OE=0;
@@ -133,7 +139,7 @@ void mux_set_y_for_input(byte reg_y) {
                 for(x=0; x<3; x++) {
                     cube[z][y][x]= (c%2==0) ? RED : GREEN;
                     mux_show_layer(z);
-                    wait(150);
+                    wait(50);
                     cube[z][y][x]= BLANK;
                 }
             }

@@ -13,7 +13,6 @@
 #include "fsm.h"
 #include "detector.h"
 #include "time.h"
-
 /**
  Z-Y-X array holding the LED state 
  */
@@ -24,6 +23,7 @@ color_t cube[3][3][3]= {
 };
 
 volatile time_t time__ = 0;
+volatile timer_signal_t tmr_signal;
 
 void init_ports() {
     ADCON1bits.VCFG0 = 0;   // Vref = Vdd
@@ -63,6 +63,7 @@ void init_timer() {
     
     INTCONbits.PEIE = 1;    // enable peripherical interrupts
     INTCONbits.GIE = 1;     // enable interrupts
+    
 }
 
 void interrupt ISR() {
@@ -73,12 +74,14 @@ void interrupt ISR() {
          */
         if (tmr_signal.busy==0) {
             tmr_signal.display_layer = (tmr_signal.display_layer+1) % LAYERS;
-            
             if (tmr_signal.display_layer==0) {
                 tmr_signal.sense_layer = (tmr_signal.sense_layer+1) % LAYERS;
-                tmr_signal.sense_refresh = 1;
-                tmr_signal.display_refresh=1;
+                tmr_signal.refresh = SENSE;
             }
+            else {
+                tmr_signal.refresh = DISPLAY;
+            }
+            
         }
         INTCONbits.TMR0IF = 0;  // clear TMR0 interrupt flag
     }
@@ -134,31 +137,42 @@ void test_main() {
     
 }
 
-
+void set_test_pattern() {
+    byte rr = 0x23;
+    byte rc;
+    for (byte i=0; i<27; i++) {
+        // pseudo random
+        for (byte c=0; c<3; c++) {
+            rr = (rr << 1) | ((rr & 0x80) >> 7) ^ ((rr & 0x40)>>6);
+        }
+        rc = rr & 0x1;
+        *((color_t*)cube + i) = rc > 1 ? RED : GREEN;
+    }
+    
+}
 
 void main(void) {
     init_ports();
     fsm_init();
     init_timer();
     mux_init();
-    mux_test_output(5);
-    test_main();
-    /*
+    mux_test_output(1);
+    //test_main();
+    set_test_pattern();
+    
     while(1)
     {
-        fsm_loop();
-        
-        if (tmr_signal.sense_refresh) {
-            tmr_signal.busy = true;
-            led_covered = detector_check(tmr_signal.sense_layer, &sensed_pixel);
-            tmr_signal.sense_refresh = false;
-        }
-        if (tmr_signal.display_refresh) {
-            tmr_signal.busy = true;
-            mux_show_layer(tmr_signal.display_layer);
-            tmr_signal.display_refresh=0;
-            tmr_signal.busy=false;
+        //fsm_loop();
+        switch (tmr_signal.refresh) {
+            case SENSE:
+                tmr_signal.busy = 1;
+                led_covered = detector_check(tmr_signal.sense_layer, &sensed_pixel);
+            case DISPLAY:
+                tmr_signal.busy = 1;
+                mux_show_layer(tmr_signal.display_layer);
+                tmr_signal.refresh=NONE;
+                tmr_signal.busy=0;
+                break;
         }
     }
-    */
 }

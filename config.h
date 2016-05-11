@@ -56,13 +56,16 @@ typedef union {
     mux_parts_t p;
 } mux_register_t;
 
-volatile struct {
+#define NONE 0
+#define SENSE 2
+#define DISPLAY 1
+
+typedef struct {
     byte display_layer      : 2;
-    byte display_refresh    : 1;
     byte sense_layer        : 2;
-    byte sense_refresh      : 1;
+    byte refresh           : 3;
     byte busy               : 1;
-} tmr_signal;
+} timer_signal_t;
     
 #ifdef	__cplusplus
 }
