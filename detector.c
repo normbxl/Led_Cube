@@ -5,14 +5,36 @@
 #include "detector.h"
 #include "mux.h"
 
+
+#define DETECT_THRESHOLD 30.0
+
+float old_q[3][3][3];
+float old_v[3][3][3];
+
+const float ALPHA = 0.05;
+const float BETA = 0.5;
+
+pixel2_t rev_lut[2][9] = {
+    {
+        {0, 0},{1, 0},{2, 0},
+        {2, 1},{2, 2},{1, 2},
+        {0, 2},{0, 1},{1, 1}
+    },
+    {
+        {0, 0},{0, 1},{2, 0},
+        {1, 0},{2, 2},{2, 1},
+        {0, 2},{1, 2},{1, 1}
+    }
+};
+
 bool detector_check(byte layer, pixel3_t *pos) {
-    byte y, x, k;
+    byte y, x, k, z;
     // TODO: check for center LEDs
     mux_register_t regs = mux_get_by_layer(layer);
     // activate only unused ones
     byte gnd_reg = ~regs.p.reg_y;
     // 
-    byte gnd_mask = 0b00010101;
+    byte gnd_mask = 0b10101000;
     float q, v;
     bool result=false;
     
@@ -22,7 +44,7 @@ bool detector_check(byte layer, pixel3_t *pos) {
     for (byte r=0; r<3; r++) {
         // logic AND to mask out even or odd gnd connectors
         mux_set_y_for_input(gnd_reg & gnd_mask);
-        
+        z = r==0 ? 0 : 1;
         for (byte i=0; i < (r==2 ? 1 : 4); i++) {
             
             ADCON0bits.CHS = i;
@@ -32,8 +54,8 @@ bool detector_check(byte layer, pixel3_t *pos) {
                 // do something useful while waiting for the ADC 
                 k = (i<<1) + (r == 2 ? 8 : r);
             }
-            x = rev_lut[k].x;
-            y = rev_lut[k].y;
+            x = rev_lut[z][k].x;
+            y = rev_lut[z][k].y;
             int adc_value = (ADRESH << 2) + (ADRESL >> 6);
             q = ALPHA *(float)adc_value + old_q[layer][y][x] * (1-ALPHA);
             v = BETA *(float)adc_value + old_v[layer][y][x] * (1-BETA);
@@ -44,7 +66,7 @@ bool detector_check(byte layer, pixel3_t *pos) {
                 result = true;
             }
         }
-        gnd_mask = gnd_mask << 1;
+        gnd_mask = gnd_mask >> 1;
     }
     return result;
 }

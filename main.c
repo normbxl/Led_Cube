@@ -31,7 +31,7 @@ void init_ports() {
     ADCON1bits.PCFG = 0b1010;   // AN0-AN3 = analog in
     
     //ADCON0bits.CHS = 0x7;   // select AN0-AN3
-    ADCON2bits.ACQT = 0x07; // 20 Tads to charge C
+    ADCON2bits.ACQT = 0x05; // 20 Tads to charge C
     ADCON2bits.ADCS = 0b110; // Fosc/64
     
     ADCON0bits.ADON = 1;    // turn on ADC
