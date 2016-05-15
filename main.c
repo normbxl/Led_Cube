@@ -88,13 +88,13 @@ void interrupt ISR() {
          */
         if (tmr_signal.busy==0) {
             tmr_signal.display_layer = (tmr_signal.display_layer+1) % LAYERS;
-            if (tmr_signal.display_layer==0) {
-                tmr_signal.sense_layer = (tmr_signal.sense_layer+1) % LAYERS;
-                tmr_signal.refresh = SENSE;
-            }
-            else {
+//            if (tmr_signal.display_layer==0) {
+//                tmr_signal.sense_layer = (tmr_signal.sense_layer+1) % LAYERS;
+//                tmr_signal.refresh = SENSE;
+//            }
+//            else {
                 tmr_signal.refresh = DISPLAY;
-            }
+            //}
             
         }
         INTCONbits.TMR0IF = 0;  // clear TMR0 interrupt flag
@@ -108,52 +108,6 @@ void interrupt ISR() {
         Serial_ReadISR();
     }
 #endif
-}
-
-void test_main() {
-    bool pDown = false;
-    time_t pDown_ts;
-    byte c=9;
-    
-    color_t col = GREEN;
-
-    //mux_register_t reg_struct;
-    while (1) {
-        //PORTCbits.RC2 = P_RESET;
-        if (P_RESET == 0 && !pDown) {
-            pDown=true;
-            pDown_ts=TIME;
-        }
-        // on release
-        else if ( P_RESET == 1 && pDown && pDown_ts + 100 < TIME ) {
-           
-            
-            //mux_test_output(2);
-            //for (byte i=0; i<27; i++) {
-            //    *((color_t*)cube + i) = BLANK;
-            //}
-            
-            if (c==27) {
-                col= col==RED ? GREEN : RED;
-                c=0;
-            }
-            
-            if (c>0) {
-                byte d=c-1;
-                cube[d/9][(d/3)%3][d%3] = BLANK;
-                //*((color_t*)cube + c-1) = BLANK;
-            }
-            //*((color_t*)cube + c) = col;
-            cube[c/9][(c/3)%3][c%3] = col;
-            mux_show_layer(c/9);    
-            
-            c++;
-        }
-        if (P_RESET==1) {
-            pDown=false;
-        }
-    }
-    
 }
 
 void set_test_pattern() {
@@ -170,150 +124,19 @@ void set_test_pattern() {
     
 }
 
-void set_uc_gnd(byte reg) {
-    
-}
-
-void adc_test_main_2() {
-    char *b;
-    int status;
-    Serial_begin(9600);
-
-    char b1[10];
-    byte layer=0;
-    while (1) {
-        byte y, x, k, z;
-        // TODO: check for center LEDs
-        // mux_register_t regs = mux_get_by_layer(layer);
-        // activate only unused ones
-        byte gnd_reg = (0xC0 >> (layer*2)) | 0x3;  // ~regs.p.reg_y;
-        // 
-        
-        byte gnd_mask = 0b10101000;
-
-        int adc_value;
-        mux_register_t rt;
-        
-        // discharge
-        mux_set_y_for_measurment(0xFF);
-        
-        for (byte r=0; r<3; r++) {
-            
-            z = r==0 ? 0 : 1;
-            for (byte i=0; i < (r==2 ? 1 : 4); i++) {
-                ADCON2bits.ADCS = 0b110; // Fosc/64
-                ADCON2bits.ACQT = 0x02; // 20 Tads to charge C
-
-                ADCON0bits.CHS = i;
-                //mux_set_y_for_input(gnd_reg & gnd_mask);
-                
-                
-                ADCON0bits.GO = 1;
-                do {
-                    NOP();
-                }
-                while (ADCON0bits.DONE == 0);
-                
-                adc_value = (ADRESH << 8) + ADRESL;
-                itoa(b1, adc_value, 10);
-                Serial_write((byte)(i*2+r+48));
-                Serial_print("=");
-                Serial_print(b1);
-                Serial_print("\t");
-            }
-            gnd_mask = gnd_mask >> 1;
-        }
-        
-        Serial_print("\r\n");
-        wait(200);
-    }
-
-}
-
-void adc_test_main() {
-    char *b;
-    int status;
-    //Serial_begin(9600);
-    //mux_test_output(1);
-    
-    while (1) {
-        switch (tmr_signal.refresh) {
-           case SENSE:
-               tmr_signal.busy = 1;
-               led_covered = detector_check(tmr_signal.sense_layer, &sensed_pixel);
-               if (led_covered) {
-                   cube[sensed_pixel.z][sensed_pixel.y][sensed_pixel.x] = GREEN;
-//                   Serial_print("LED COVERED: ");
-//                   Serial_write(sensed_pixel.x+48); 
-//                   Serial_print(", ");
-//                   Serial_write(sensed_pixel.y+48); 
-//                   Serial_print(", ");
-//                   Serial_write(sensed_pixel.z+48); 
-//                   Serial_print("\r\n");
-               }
-           case DISPLAY:
-               tmr_signal.busy = 1;
-               mux_show_layer(tmr_signal.display_layer);
-               tmr_signal.refresh=NONE;
-               tmr_signal.busy=0;
-               break;
-        }
-        /*
-        if (Serial_available()) {
-            while (Serial_available()>0) {
-                byte b=Serial_read();
-                switch(b) {
-                    case 'a':
-                        inc_alpha(-0.02);
-                        break;
-                    case 'A':
-                        inc_alpha(0.02);
-                        break;
-                    case 'b':
-                        inc_beta(-0.02);
-                        break;
-                    case 'B':
-                        inc_beta(0.02);
-                        break;
-                    case 'c':
-                        for (byte a=0; a<27; a++) {
-                            *(((color_t*)cube)+a) = BLANK;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-            
-            Serial_print("ALPHA=");
-            b = ftoa(inc_alpha(0.0), &status);
-            Serial_print(b);
-            Serial_print(" BETA=");
-            b = ftoa(inc_beta(0.0), &status);
-            Serial_println(b);
-        }
-        */ 
-         
-    }
-    
-    
-}
-
 void main(void) {
     init_ports();
     fsm_init();
     init_timer();
     mux_init();
 
-    adc_test_main();
-
-    mux_test_output(1);
+    //mux_test_output(2);
     //test_main();
-    set_test_pattern();
+    //set_test_pattern();
     
     while(1)
     {
-        //fsm_loop();
+        fsm_loop();
         switch (tmr_signal.refresh) {
             case SENSE:
                 tmr_signal.busy = 1;

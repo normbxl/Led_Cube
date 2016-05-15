@@ -147,25 +147,21 @@ void mux_set_y_for_measurment(byte reg_y) {
 mux_register_t mux_get_by_layer(byte z) {
     mux_register_t out;
     mux_register_t w_reg;
+    color_t color;
+    
     out.value=0;
     for (byte y=0; y<3; y++) {
         for (byte x=0; x<3; x++) {
-            if (cube[z][y][x] != BLANK) {
+            color = cube[z][y][x];
+            color = color < 3 ? color : (blink() ? ((color-3) >> 1) : BLANK); 
+            if (color != BLANK) {
                 w_reg.value = 0;
-                /*if (x==1 && y==1 && z>0) {
-                    w_reg.p.reg_x = 1 << (cube[z][y][x]==RED ? 2 : 6);
-                    w_reg.p.reg_y = 1 << (z==1 ? 1 : 0);
-                 */ 
-                
-                switch (cube[z][y][x]) {
+                switch (color) {
                     case GREEN:
                         w_reg.p.reg_x = mux_lut[z][y][x].p.reg_x << 4;
                         break;
                     case RED:
                         w_reg.p.reg_x = mux_lut[z][y][x].p.reg_x;
-                        break;
-                    case YELLOW:
-                        w_reg.p.reg_x = mux_lut[z][y][x].p.reg_x | (mux_lut[z][y][x].p.reg_x << 4);
                         break;
                 }
                 w_reg.p.reg_y = mux_lut[z][y][x].p.reg_y;

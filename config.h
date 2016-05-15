@@ -25,6 +25,13 @@ extern "C" {
 #define P_DAT   PORTBbits.RB2   // data
     
 #define P_OE  PORTBbits.RB3     // output-enable
+    
+#define P_LEFT PORTBbits.RB4
+#define P_DOWN PORTBbits.RB5
+#define P_RIGHT PORTBbits.RB6
+#define P_UP PORTBbits.RB7
+#define P_FIRE PORTAbits.RA5
+    
 #define P_RESET PORTCbits.RC0   // RESET
 
     
@@ -32,7 +39,7 @@ typedef unsigned char   uint8_t;
 typedef uint8_t         byte;
 typedef unsigned int    mux_t;
 
-typedef enum { BLANK=0, GREEN, RED, YELLOW } color_t ;
+typedef enum { BLANK=0, GREEN, RED, CURSOR_GREEN_B, CURSOR_RED_B, CURSOR_GREEN_G, CURSOR_RED_G, CURSOR_GREEN_R, CURSOR_RED_R } color_t ;
 
 // 3-D pixel, 2 bits per component is sufficent in a 3x3x3 world
 typedef struct {

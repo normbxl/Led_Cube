@@ -8,6 +8,8 @@
 #ifndef TIME_H
 #define	TIME_H
 
+#include <stdbool.h>
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
@@ -16,10 +18,11 @@ extern "C" {
     // extern time_t __time;
     
 #define TIME time__
+#define BLINK_PERIODE 300
 time_t time();
 
 void wait(time_t t);
-
+bool blink();
 
 #ifdef	__cplusplus
 }
