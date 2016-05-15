@@ -119,7 +119,7 @@ void mux_show_layer(byte z) {
     
 }
 
-void mux_set_y_for_input(byte reg_y) {
+void mux_set_y_for_measurment(byte reg_y) {
     
     mux_register_t reg_struct;
     reg_struct.p.reg_y = reg_y;

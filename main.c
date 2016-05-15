@@ -195,7 +195,7 @@ void adc_test_main_2() {
         mux_register_t rt;
         
         // discharge
-        mux_set_y_for_input(0xFF);
+        mux_set_y_for_measurment(0xFF);
         
         for (byte r=0; r<3; r++) {
             

@@ -21,7 +21,7 @@ extern "C" {
      * Set MUX for input-readings, X-Ports are switched off, only Y-coords are needed
      * @param reg_y
      */
-    void mux_set_y_for_input(byte reg_y);
+    void mux_set_y_for_measurment(byte reg_y);
     
     /**
      * outputs layer z by looking up set pixels in cube[][][]

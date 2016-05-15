@@ -29,11 +29,48 @@ pixel2_t rev_lut[2][9] = {
         {0, 2},{1, 2},{1, 1}
     }
 };
+// 1st bit = GND_1 !
+int mux_measure_gnd_charge(byte *reg) {
+    // disable interrupts
+    INTCONbits.GIE = 0;
+    // outputs 
+    TRISB |= 0xF0;
+    TRISA |= 0x30;
+    TRISC |= 0xC0;
+    
+    byte pb = LATB & 0x0F;
+    byte pa = LATA & 0x0F;
+    byte pc = LATC & 0x3F;
+    int c=0;
+            
+    pb |= *reg << 4;
+    pa |= *reg & 0x30;
+    pc |= *reg & 0xC0;
+    
+    PORTB = pb;
+    PORTA = pa;
+    PORTC = pc;
+    
+    // stop charging, turn ports to inpus 
+    TRISB &= ~0xF0;
+    TRISA &= ~0x30;
+    TRISC &= ~0xC0;
+    
+    // wait until the first GND drops to LOW
+    while (pa == PORTA && pb==PORTB && pc==PORTC) {
+        c++;
+    }
+    
+    *reg = (PORTC & 0xC0) | (PORTA & 0x30) | (PORTB >> 4);
+    // re-enable interrrupts
+    INTCONbits.GIE = 1;
+    
+    return c;
+}
 
 bool detector_check(byte layer, pixel3_t *pos) {
     byte y, x, k, z;
     // TODO: check for center LEDs
-    // mux_register_t regs = mux_get_by_layer(layer);
     // activate only unused ones
     byte gnd_reg = (0xC0 >> (layer*2)) | 0x3;  // ~regs.p.reg_y;
     // 
@@ -50,11 +87,13 @@ bool detector_check(byte layer, pixel3_t *pos) {
     // we have to shift the gnd-mask twice to multiplex the 4 analog input that
     // are connected to the green anode, the last shift is for the center pole
     // which is connected to A0
+    
     for (byte r=0; r<3; r++) {
-        // discharge all lines
-        mux_set_y_for_input(0xFF);
-        // wait for 50µs to discharge LED anodes
-        // __delay_us(50);
+        
+        // cut off GNDs
+        mux_set_y_for_measurment(0x00);
+        
+        
         z = r==0 ? 0 : 1;
         for (byte i=0; i < (r==2 ? 1 : 4); i++) {
             ADCON2bits.ADCS = 0b110; // Fosc/64
@@ -62,7 +101,7 @@ bool detector_check(byte layer, pixel3_t *pos) {
             
             ADCON0bits.CHS = i;
             // logic AND to mask out even or odd gnd connectors
-            mux_set_y_for_input(gnd_reg & gnd_mask);
+            mux_set_y_for_measurment(gnd_reg & gnd_mask);
             ADCON0bits.GO = 1;
             do {
                 // do something useful while waiting for the ADC 
@@ -70,7 +109,7 @@ bool detector_check(byte layer, pixel3_t *pos) {
             }
             
             while (ADCON0bits.DONE == 0);
-            mux_set_y_for_input(0xFF);
+            mux_set_y_for_measurment(0xFF);
             
             x = rev_lut[z][k].x;
             y = rev_lut[z][k].y;
@@ -91,6 +130,12 @@ bool detector_check(byte layer, pixel3_t *pos) {
                 pos->z = layer;
                 result = true;
             }
+            
+            // if something high found
+            // reverse bias LED by charging them directly by the PIC
+            byte reg=0xFF;
+            int cycles = mux_measure_gnd_charge(&reg);
+            
         }
         gnd_mask = gnd_mask >> 1;
     }
