@@ -16,7 +16,8 @@ extern "C" {
 
     
     bool detector_check(byte layer, pixel3_t *pos);
-    
+float inc_alpha(float f);
+float inc_beta(float f);
 
 #ifdef	__cplusplus
 }

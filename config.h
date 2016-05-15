@@ -14,17 +14,17 @@
 extern "C" {
 #endif
 
-    
-#define _XTAL_FREQ 20000000
+#ifndef _XTAL_FREQ
+    #define _XTAL_FREQ 48000000
+#endif
 #define LAYERS 3
 
 // Port shortcuts
 #define P_CLK   PORTBbits.RB1   // clock
 #define P_STR   PORTBbits.RB0   // strobe
-#define P_DAT   PORTCbits.RC7   // data
+#define P_DAT   PORTBbits.RB2   // data
     
-#define P_OE  PORTBbits.RB2     // output-enable X-lines (G-R)
-#define P_OE_Y  PORTBbits.RB3   // output-enable Y-lines (GND)
+#define P_OE  PORTBbits.RB3     // output-enable
 #define P_RESET PORTCbits.RC0   // RESET
 
     

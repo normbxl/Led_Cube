@@ -8,11 +8,10 @@ extern color_t current_player;
 
 void mux_init() {
     mux_t reg=0;
-    P_OE=0;
-    P_OE_Y = 0;
+    
     __mux_shift_out(reg);
     P_OE=1;
-    P_OE_Y = 1;
+    
     // fill the MUX-Reg-Translation LUT for one layer
     // 1
     mux_lut[0][0][0].p.reg_x=1<<3;
@@ -116,19 +115,17 @@ void mux_show_layer(byte z) {
     
     reg_struct.p.reg_x = ~reg_struct.p.reg_x;
     
-    P_OE=0;
-    P_OE_Y=0;
     __mux_shift_out(reg_struct.value);
-    P_OE=1;
-    P_OE_Y=1;
     
 }
 
 void mux_set_y_for_input(byte reg_y) {
-    mux_t reg = (mux_t)(reg_y & 0xFF);
-    P_OE=0;
-    __mux_shift_out(reg);
-    P_OE=1;
+    
+    mux_register_t reg_struct;
+    reg_struct.p.reg_y = reg_y;
+    // x-drivers must be set high (pnp-transistors: in blocking mode)
+    reg_struct.p.reg_x = 0xFF;
+    __mux_shift_out(reg_struct.value);
 }
 
  void mux_test_output(byte cycles) {
@@ -195,12 +192,10 @@ void __mux_shift_out(mux_t reg) {
         }
         //clock impulse
         P_CLK = 1;
-        __delay_us(10);
+        __delay_us(2);
         P_CLK = 0;
-        __delay_us(10);
-        
-        P_DAT = 0;
     }
     // strobe
     P_STR = 0;
+    P_DAT = 0;
 }
