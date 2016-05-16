@@ -20,11 +20,13 @@ extern "C" {
 
 
 bool led_covered;
-pixel3_t sensed_pixel;
+pixel3_t selected_pixel;
 
 
 void fsm_init();
 void fsm_loop(void);
+
+void fsm_clear_cube();
 
 #ifdef	__cplusplus
 }

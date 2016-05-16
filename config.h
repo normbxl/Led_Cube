@@ -33,7 +33,7 @@ extern "C" {
 #define P_FIRE  PORTAbits.RA5
     
 #define P_RESET PORTCbits.RC0   // RESET
-#define P_LED   PORTCbits.RC2
+#define P_LED   PORTCbits.RC1
     
 typedef unsigned char   uint8_t;
 typedef uint8_t         byte;

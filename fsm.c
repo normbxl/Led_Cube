@@ -1,8 +1,10 @@
 #include "fsm.h"
 #include "intelligence.h"
 #include "button.h"
+#include "time.h"
+#include <stdlib.h>
 
-#define UART_DEBUG
+//#define UART_DEBUG
 
 #ifdef UART_DEBUG
     // #include "serial/system.h"
@@ -25,16 +27,12 @@ color_t winner_color;
 color_t current_player;
 
 bool three_in_a_row;
-bool LED_set;
-bool winner_determined;
-
-
 
 enum 
 {
     START_FSM =             0,
-    BTN_DWN   =             1,
-    WAIT_FOR_LED_EVENT_FSM= 2,
+    INIT_GAME   =           1,
+    WAIT_FOR_JOYSTICK=      2,
     SET_CHOSEN_LED_FSM  =   3,
     CHECK_3_IN_A_ROW_FSM =  4, 
     GAME_TIE             =  5,
@@ -52,18 +50,20 @@ button_t btn_left;
 button_t btn_right;
 button_t btn_fire;
 
+button_t frame_state;
 
+unsigned int generator_periode = 597;
 
 void fsm_init() {
     current_state = START_FSM;
     old_state = START_FSM;
-    led_covered = false;
     three_in_a_row = false;
-    LED_set = false;
-    winner_determined = false;
+
     winner_color = BLANK;
     
     current_player = GREEN;
+    srand((unsigned int)time());
+    
 #ifdef UART_DEBUG
     Serial_begin(9600);
     Serial_println("-- LED CUBE --");
@@ -119,17 +119,18 @@ bool fsm_joystick_ctrl() {
     if (fire==ON_RELEASE && cursor_old.z==cursor.z && cursor_old.y == cursor_old.y && cursor_old.x==cursor.x) {
         color_t col = cube[cursor.z][cursor.y][cursor.x];
         if (col == CURSOR_GREEN_B || col == CURSOR_RED_B) {
-            sensed_pixel.x = cursor.x;
-            sensed_pixel.y = cursor.y;
-            sensed_pixel.z = cursor.z;
+            selected_pixel.x = cursor.x;
+            selected_pixel.y = cursor.y;
+            selected_pixel.z = cursor.z;
 #ifdef UART_DEBUG
             Serial_print("pixel set at ");
             Serial_write(cursor.x+48); Serial_print(", ");
             Serial_write(cursor.y+48); Serial_print(", ");
             Serial_write(cursor.z+48); Serial_print("\r\n");
 #endif
+            return true;
         }
-        return true;
+        
     }
     
     if (fire == DOWN) {
@@ -185,6 +186,13 @@ void set_state(byte state) {
  * Output:          None
  * Overview:        A simple FSM that will not yet work.          
  ********************************************************************/
+void generate_pattern() {
+    for (byte i=0; i<27; i++) {
+        *((color_t*)cube + i) = rand() % 3;
+    }
+    
+}
+
 void fsm_loop(void) {
 
     switch (current_state) {
@@ -193,24 +201,42 @@ void fsm_loop(void) {
 
             // *** transitions ***
             if (P_RESET == PUSHED || button_check(P_FIRE, &btn_fire)==ON_DOWN) {
-                set_state(BTN_DWN);
+                set_state(INIT_GAME);
             }
+            
+            if (button_check(P_DOWN, &btn_down)==ON_DOWN) {
+                generator_periode = generator_periode-25 > 25 ? generator_periode-25 : 25;
+            }
+            if (button_check(P_UP, &btn_up)==ON_DOWN) {
+                generator_periode = generator_periode+25;
+            }
+            
+            if (button_check((byte)blink_at(generator_periode), &frame_state)==ON_DOWN) {
+                generate_pattern();
+            }
+            
             break;
 
-        case BTN_DWN:
+        case INIT_GAME:
             // *** outputs ***
 
             // *** transitions ***
             if (P_RESET != PUSHED || button_check(P_FIRE, &btn_fire)==ON_RELEASE) {
-                cursor.x= cursor_old.x=1;
-                cursor.y= cursor_old.y=1;
-                cursor.z= cursor_old.z=0;
-                
-                set_state(WAIT_FOR_LED_EVENT_FSM);
+                fsm_clear_cube();
+                cursor.x= 1;
+                cursor.y= 1;
+                cursor.z=0;
+                cursor_old.x = 3;
+                cursor_old.y= 3;
+                cursor_old.z= 3;
+                current_player = (rand() % 2)+1;
+                winner_color = BLANK;
+                set_state(WAIT_FOR_JOYSTICK);
+                wait(20);
             }
             break;
 
-        case WAIT_FOR_LED_EVENT_FSM:
+        case WAIT_FOR_JOYSTICK:
             // *** outputs ***
 
             // *** transitions ***
@@ -225,7 +251,7 @@ void fsm_loop(void) {
 
         case SET_CHOSEN_LED_FSM:
             // *** outputs ***
-            cube[sensed_pixel.z][sensed_pixel.y][sensed_pixel.x] = current_player;
+            cube[selected_pixel.z][selected_pixel.y][selected_pixel.x] = current_player;
             
             // *** transitions ***
 
@@ -249,12 +275,17 @@ void fsm_loop(void) {
                 current_player = current_player == GREEN ? RED : GREEN;
                 if (fsm_is_end_of_game()==true) {
                     set_state(GAME_TIE);
+                    
+                    // make them all blinky
+                    for (int c=0; c<27; c++) {
+                        *((color_t*)(cube) + c) += 2;
+                    }
 #ifdef UART_DEBUG
                     Serial_println("TIE");
 #endif
                 }
                 else {
-                    set_state(WAIT_FOR_LED_EVENT_FSM);
+                    set_state(WAIT_FOR_JOYSTICK);
                 }
             }
             else {
@@ -298,30 +329,35 @@ void fsm_loop(void) {
         case RESET:
             // *** outputs ***
             // erase cube
-            for (int c=0; c<27; c++) {
-                *((color_t*)(cube) + c) = BLANK;
-            }
+            fsm_clear_cube();
             cursor.x=1;
             cursor.y=1;
             cursor.z=0;
             // *** transitions ***
-            if (P_RESET != PUSHED) {
-                set_state(START_FSM);
-            }
+            
+            set_state(START_FSM);
             break;
 
         default:
             set_state(START_FSM);
             break;
     }
+
     if (current_state != old_state) {
         //Serial_print("state changed ");
+#ifdef UART_DEBUG
         Serial_write(old_state+48);
         Serial_print("->");
         Serial_write(current_state+48);
         Serial_print("\r\n");
+#endif
         old_state=current_state;
     }
+}
 
+void fsm_clear_cube() {
+    for (int c=0; c<27; c++) {
+        *((color_t*)(cube) + c) = BLANK;
+    }
 }
 //EOF-------------------------------------------------------------------------

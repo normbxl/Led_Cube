@@ -21,8 +21,9 @@ extern "C" {
 #define BLINK_PERIODE 150
 time_t time();
 
-void wait(time_t t);
+void wait(const time_t t);
 bool blink();
+bool blink_at(const unsigned int periode);
 
 #ifdef	__cplusplus
 }

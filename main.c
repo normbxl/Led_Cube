@@ -140,22 +140,18 @@ void main(void) {
     fsm_init();
     init_timer();
     mux_init();
-
-    //mux_test_output(1);
-    //test_main();
-    //set_test_pattern();
-    //set_test_pattern_2();
-    
+  
     while(1)
     {
         switch (tmr_signal.refresh) {
-            case SENSE:
-//                tmr_signal.busy = 1;
-//                led_covered = detector_check(tmr_signal.sense_layer, &sensed_pixel);
+           
             case FSM:
                 tmr_signal.busy=1;
                 fsm_loop();
-                
+                mux_show_layer(tmr_signal.display_layer);
+                tmr_signal.refresh=NONE;
+                tmr_signal.busy=0;
+                break;
             case DISPLAY:
                 tmr_signal.busy = 1;
                 mux_show_layer(tmr_signal.display_layer);

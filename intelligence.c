@@ -71,6 +71,7 @@ color_t three_in_a_row_check() {
             return  cen;
         }
     }
+    return BLANK;
 }
 
 
