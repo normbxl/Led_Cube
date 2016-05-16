@@ -192,7 +192,7 @@ void fsm_loop(void) {
             // *** outputs ***
 
             // *** transitions ***
-            if (P_RESET == PUSHED) {
+            if (P_RESET == PUSHED || button_check(P_FIRE, &btn_fire)==ON_DOWN) {
                 set_state(BTN_DWN);
             }
             break;
@@ -201,7 +201,7 @@ void fsm_loop(void) {
             // *** outputs ***
 
             // *** transitions ***
-            if (P_RESET != PUSHED) {
+            if (P_RESET != PUSHED || button_check(P_FIRE, &btn_fire)==ON_RELEASE) {
                 cursor.x= cursor_old.x=1;
                 cursor.y= cursor_old.y=1;
                 cursor.z= cursor_old.z=0;
@@ -278,7 +278,9 @@ void fsm_loop(void) {
             if (P_RESET == PUSHED) {
                 set_state(RESET);
             }
-
+            if (button_check(P_FIRE, &btn_fire)==ON_RELEASE) {
+                set_state(RESET);
+            }
             break;
 
         case FLASH_WIN_FSM:
@@ -288,7 +290,9 @@ void fsm_loop(void) {
             if (P_RESET == PUSHED) {
                 set_state(RESET);
             }
-            
+            if (button_check(P_FIRE, &btn_fire)==ON_RELEASE) {
+                set_state(RESET);
+            }
             break;
 
         case RESET:

@@ -8,16 +8,16 @@ extern color_t current_player;
 
 mux_register_t layer_reg;
 
-const pixel2_t rev_lut[2][9] = {
+const pixel2_t mux_rev_lut[2][8] = {
     {
         {0, 0},{1, 0},{2, 0},
         {2, 1},{2, 2},{1, 2},
-        {0, 2},{0, 1},{1, 1}
+        {0, 2},{0, 1}
     },
     {
         {0, 0},{0, 1},{2, 0},
         {1, 0},{2, 2},{2, 1},
-        {0, 2},{1, 2},{1, 1}
+        {0, 2},{1, 2}
     }
 };
 
@@ -123,9 +123,9 @@ void mux_show_layer(byte z) {
     mux_register_t reg = mux_get_by_layer(z >> 1, z % 2);;
     
     // add current player indication
-    if (z==7) {
-        // reg.p.reg_x |= (current_player == RED ? 0x2 : 0x20);
-        //reg_struct.p.reg_y |= 0x2;
+    if (z==6) {
+        reg.p.reg_x |= (current_player == RED ? 0x20 : 0x2);
+        reg.p.reg_y |= 0x2;
     }
     
     
@@ -176,8 +176,8 @@ mux_register_t mux_get_by_layer(byte z, byte g) {
     byte _z = z;
     
     
-    for (byte k=g; k<9; k+=2) {
-        if (_z==4) {
+    for (byte k=g; k<8; k+=2) {
+        if (_z==3) {
             x=1;
             y=1;
             z= g==0 ? (k==0 ? 0 : 1) : 2;
@@ -187,8 +187,8 @@ mux_register_t mux_get_by_layer(byte z, byte g) {
             }
         }
         else {
-            x=rev_lut[r][k].x;
-            y=rev_lut[r][k].y;
+            x=mux_rev_lut[r][k].x;
+            y=mux_rev_lut[r][k].y;
         }
         color = cube[z][y][x];
         if (color > RED) {

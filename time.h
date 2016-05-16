@@ -18,7 +18,7 @@ extern "C" {
     // extern time_t __time;
     
 #define TIME time__
-#define BLINK_PERIODE 300
+#define BLINK_PERIODE 150
 time_t time();
 
 void wait(time_t t);

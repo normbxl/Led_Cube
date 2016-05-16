@@ -70,7 +70,7 @@ void init_timer() {
     T0CONbits.T08BIT = 1;   // 8bit
     T0CONbits.T0CS=0;       // instruction clock (12 MHz)
     T0CONbits.PSA=0;        // use prescaler
-    T0CONbits.T0PS=0x06;    // prescaler 64 => P=1.3ms f=732Hz
+    T0CONbits.T0PS=0x05;    // prescaler 32 0x06:64 => P=1.3ms f=732Hz
     INTCONbits.TMR0IE = 1;  // enable timer0 interrupt
     T0CONbits.TMR0ON = 1;   // Timer0 On
     
@@ -131,7 +131,7 @@ void set_test_pattern() {
 
 void set_test_pattern_2() {
     cube[0][0][2] = GREEN;
-    cube[0][1][2] = GREEN;
+    //cube[0][1][2] = GREEN;
     cube[0][1][1] = GREEN;
 }
 
@@ -144,7 +144,7 @@ void main(void) {
     //mux_test_output(1);
     //test_main();
     //set_test_pattern();
-    set_test_pattern_2();
+    //set_test_pattern_2();
     
     while(1)
     {
