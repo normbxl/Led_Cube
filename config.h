@@ -24,16 +24,16 @@ extern "C" {
 #define P_STR   PORTBbits.RB0   // strobe
 #define P_DAT   PORTBbits.RB2   // data
     
-#define P_OE  PORTBbits.RB3     // output-enable
+#define P_OE    PORTBbits.RB3     // output-enable
     
-#define P_LEFT PORTBbits.RB4
-#define P_DOWN PORTBbits.RB5
-#define P_RIGHT PORTBbits.RB6
-#define P_UP PORTBbits.RB7
-#define P_FIRE PORTAbits.RA5
+#define P_LEFT  PORTBbits.RB4
+#define P_DOWN  PORTBbits.RB5
+#define P_UP    PORTBbits.RB6
+#define P_RIGHT PORTBbits.RB7
+#define P_FIRE  PORTAbits.RA5
     
 #define P_RESET PORTCbits.RC0   // RESET
-
+#define P_LED   PORTCbits.RC2
     
 typedef unsigned char   uint8_t;
 typedef uint8_t         byte;
@@ -64,14 +64,14 @@ typedef union {
 } mux_register_t;
 
 #define NONE 0
+#define FSM 3
 #define SENSE 2
 #define DISPLAY 1
 
 typedef struct {
-    byte display_layer      : 2;
-    byte sense_layer        : 2;
+    byte display_layer     : 4;
     byte refresh           : 3;
-    byte busy               : 1;
+    byte busy              : 1;
 } timer_signal_t;
     
 #ifdef	__cplusplus

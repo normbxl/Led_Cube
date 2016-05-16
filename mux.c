@@ -6,6 +6,21 @@ extern color_t cube[3][3][3];
 
 extern color_t current_player;
 
+mux_register_t layer_reg;
+
+const pixel2_t rev_lut[2][9] = {
+    {
+        {0, 0},{1, 0},{2, 0},
+        {2, 1},{2, 2},{1, 2},
+        {0, 2},{0, 1},{1, 1}
+    },
+    {
+        {0, 0},{0, 1},{2, 0},
+        {1, 0},{2, 2},{2, 1},
+        {0, 2},{1, 2},{1, 1}
+    }
+};
+
 void mux_init() {
     mux_t reg=0;
     
@@ -105,17 +120,18 @@ void mux_init() {
 
 void mux_show_layer(byte z) {
     
-    mux_register_t reg_struct = mux_get_by_layer(z);
+    mux_register_t reg = mux_get_by_layer(z >> 1, z % 2);;
     
     // add current player indication
-    if (z==0) {
-        reg_struct.p.reg_x |= (current_player == RED ? 0x2 : 0x20);
-        reg_struct.p.reg_y |= 0x2;
+    if (z==7) {
+        // reg.p.reg_x |= (current_player == RED ? 0x2 : 0x20);
+        //reg_struct.p.reg_y |= 0x2;
     }
     
-    reg_struct.p.reg_x = ~reg_struct.p.reg_x;
     
-    __mux_shift_out(reg_struct.value);
+    reg.p.reg_x = ~reg.p.reg_x;
+    
+    __mux_shift_out(reg.value);
     
 }
 
@@ -136,7 +152,7 @@ void mux_set_y_for_measurment(byte reg_y) {
                 for(x=0; x<3; x++) {
                     cube[z][y][x]= (c%2==0) ? RED : GREEN;
                     mux_show_layer(z);
-                    wait(50);
+                    wait(300);
                     cube[z][y][x]= BLANK;
                 }
             }
@@ -144,34 +160,60 @@ void mux_set_y_for_measurment(byte reg_y) {
     }
  }
 
-mux_register_t mux_get_by_layer(byte z) {
+ /**
+  * 
+  * @param z layer number
+  * @param g ground number (0 or 1)
+  * @return 
+  */
+mux_register_t mux_get_by_layer(byte z, byte g) {
     mux_register_t out;
     mux_register_t w_reg;
     color_t color;
-    
+    byte x, y;
     out.value=0;
-    for (byte y=0; y<3; y++) {
-        for (byte x=0; x<3; x++) {
-            color = cube[z][y][x];
-            color = color < 3 ? color : (blink() ? ((color-3) >> 1) : BLANK); 
-            if (color != BLANK) {
-                w_reg.value = 0;
-                switch (color) {
-                    case GREEN:
-                        w_reg.p.reg_x = mux_lut[z][y][x].p.reg_x << 4;
-                        break;
-                    case RED:
-                        w_reg.p.reg_x = mux_lut[z][y][x].p.reg_x;
-                        break;
-                }
-                w_reg.p.reg_y = mux_lut[z][y][x].p.reg_y;
-
-                out.value |= w_reg.value;
+    byte r = r==0 ? 0 : 1;
+    byte _z = z;
+    
+    
+    for (byte k=g; k<9; k+=2) {
+        if (_z==4) {
+            x=1;
+            y=1;
+            z= g==0 ? (k==0 ? 0 : 1) : 2;
+            // end loop
+            if (z >= 1) {
+                k=9;
             }
+        }
+        else {
+            x=rev_lut[r][k].x;
+            y=rev_lut[r][k].y;
+        }
+        color = cube[z][y][x];
+        if (color > RED) {
+            color = color <= CURSOR_RED_B ? color - 2 : ((color-3) >> 1); 
+            color = blink() ? color : BLANK;
+        }
+        //color = color < 3 ? color : (color-3) >> 1; 
+        if (color != BLANK) {
+            w_reg.value = 0;
+            switch (color) {
+                case GREEN:
+                    w_reg.p.reg_x = mux_lut[z][y][x].p.reg_x << 4;
+                    break;
+                case RED:
+                    w_reg.p.reg_x = mux_lut[z][y][x].p.reg_x;
+                    break;
+            }
+            w_reg.p.reg_y = mux_lut[z][y][x].p.reg_y;
+
+            out.value |= w_reg.value;
         }
     }
     return out;
 }
+
 
 void __mux_shift_out(mux_t reg) {
     //clock

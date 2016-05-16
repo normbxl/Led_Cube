@@ -2,11 +2,11 @@
 
 button_state button_check(byte val, button_t *b) {
     if (!b->initialized) {
-        b->state = val>0 ? DOWN : UP;
+        b->state = val==HIGH ? DOWN : UP;
         b->initialized=true;
     }
     else {
-        if (val>0) {
+        if (val==HIGH) {
             switch(b->state) {
                 case ON_DOWN:
                     b->state=DOWN;

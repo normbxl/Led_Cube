@@ -57,12 +57,12 @@ unsigned char  Serial_findUntil(unsigned char str, unsigned char terminator);
 void Serial_flush(void);
 
 //Prints data to the serial port. Supports Strings only.
-void Serial_print(unsigned char *str);
+void Serial_print(const char *str);
 
 // Prints data to the serial port as human-readable ASCII text followed by a carriage
 // return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
 // This command takes the same forms as Serial_print().
-void Serial_println(unsigned char *str);
+void Serial_println(const char *str);
 
 // Reads incoming serial data. Returns the first byte of incoming serial data available.
 // Supports byte only.
@@ -79,7 +79,7 @@ unsigned char Serial_readBytes(unsigned char buffer[], unsigned char length);
 unsigned char Serial_readBytesUntil(unsigned char str, unsigned char buffer[], unsigned char length);
 
 // Writes binary data to the serial port. Supports single byte only.
-void Serial_write(unsigned char str);
+void Serial_write(const char str);
 
 
 

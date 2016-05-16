@@ -37,7 +37,7 @@ extern "C" {
      */
     void __mux_shift_out(mux_t reg);
     
-    mux_register_t mux_get_by_layer(byte z);
+    mux_register_t mux_get_by_layer(byte z, byte g);
     
 
 #ifdef	__cplusplus

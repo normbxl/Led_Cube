@@ -107,14 +107,14 @@ unsigned char Serial_read(void)
 }
 
 // Writes binary data to the serial port. Supports single byte only.
-void Serial_write(unsigned char x)
+void Serial_write(const char x)
 {
         while (!TRMT);
         TXREG =  x;
 }
 
 //Prints data to the serial port. Supports Strings only.
-void Serial_print(unsigned char *str)
+void Serial_print(const char *str)
 {
      while(*str)
      {
@@ -133,7 +133,7 @@ void Serial_ReadISR(void)
 // Prints data to the serial port as human-readable ASCII text followed by a carriage
 // return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
 // This command takes the same forms as Serial_print().
-void Serial_println(unsigned char *str)
+void Serial_println(const char *str)
 {
     Serial_print(str);
     while (!TRMT);

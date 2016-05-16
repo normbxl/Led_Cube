@@ -47,6 +47,10 @@ void init_ports() {
     PORTC = 0x00; //Initial PORTC
     TRISC = 0b11000011;// RC0:1 and RC6:7 Inputs
     
+    ADCON1bits.PCFG = 0xF; // all digital inputs
+    ADCON0bits.ADON = 0;    // turn off ADC
+    
+    /*
     // ADC config
     ADCON1bits.VCFG0 = 0;   // Vref = Vdd
     ADCON1bits.VCFG1 = 0;   // Vref- = Vss
@@ -57,6 +61,7 @@ void init_ports() {
     ADCON2bits.ACQT = 0x05; // 20 Tads to charge C
     ADCON2bits.ADCS = 0b110; // Fosc/64
     ADCON0bits.ADON = 1;    // turn on ADC
+    */
     
     P_OE=1;
 }
@@ -65,10 +70,11 @@ void init_timer() {
     T0CONbits.T08BIT = 1;   // 8bit
     T0CONbits.T0CS=0;       // instruction clock (12 MHz)
     T0CONbits.PSA=0;        // use prescaler
-    T0CONbits.T0PS=0x07;    // prescaler 256 => P=5.4ms f=183Hz
+    T0CONbits.T0PS=0x06;    // prescaler 64 => P=1.3ms f=732Hz
     INTCONbits.TMR0IE = 1;  // enable timer0 interrupt
     T0CONbits.TMR0ON = 1;   // Timer0 On
     
+    // timer-functions
     T2CONbits.T2CKPS = 0x2;  // Timer2 PS 16x
     T2CONbits.TOUTPS = 0x4;   // 4x post scaler
     PR2 = 187;               // compare value for Timer2 Interrupt
@@ -87,14 +93,13 @@ void interrupt ISR() {
          * d0 d1 d2 s0 d0 d1 d2 s1 d0 d1 d2 s2, ...
          */
         if (tmr_signal.busy==0) {
-            tmr_signal.display_layer = (tmr_signal.display_layer+1) % LAYERS;
-//            if (tmr_signal.display_layer==0) {
-//                tmr_signal.sense_layer = (tmr_signal.sense_layer+1) % LAYERS;
-//                tmr_signal.refresh = SENSE;
-//            }
-//            else {
+            tmr_signal.display_layer = (tmr_signal.display_layer+1) % 8;
+            if (tmr_signal.display_layer==0) {
+                tmr_signal.refresh = FSM;
+            }
+            else {
                 tmr_signal.refresh = DISPLAY;
-            //}
+            }
             
         }
         INTCONbits.TMR0IF = 0;  // clear TMR0 interrupt flag
@@ -111,7 +116,7 @@ void interrupt ISR() {
 }
 
 void set_test_pattern() {
-    byte rr = 0x23;
+    byte rr = (TIME & 0xFF);
     byte rc;
     for (byte i=0; i<27; i++) {
         // pseudo random
@@ -124,29 +129,40 @@ void set_test_pattern() {
     
 }
 
+void set_test_pattern_2() {
+    cube[0][0][2] = GREEN;
+    cube[0][1][2] = GREEN;
+    cube[0][1][1] = GREEN;
+}
+
 void main(void) {
     init_ports();
     fsm_init();
     init_timer();
     mux_init();
 
-    //mux_test_output(2);
+    //mux_test_output(1);
     //test_main();
     //set_test_pattern();
+    set_test_pattern_2();
     
     while(1)
     {
-        fsm_loop();
         switch (tmr_signal.refresh) {
             case SENSE:
-                tmr_signal.busy = 1;
-                led_covered = detector_check(tmr_signal.sense_layer, &sensed_pixel);
+//                tmr_signal.busy = 1;
+//                led_covered = detector_check(tmr_signal.sense_layer, &sensed_pixel);
+            case FSM:
+                tmr_signal.busy=1;
+                fsm_loop();
+                
             case DISPLAY:
                 tmr_signal.busy = 1;
                 mux_show_layer(tmr_signal.display_layer);
                 tmr_signal.refresh=NONE;
                 tmr_signal.busy=0;
                 break;
+            
         }
     }
 }

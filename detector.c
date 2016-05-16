@@ -17,7 +17,7 @@ byte initializing = 3;
 
 extern color_t cube[3][3][3];
 
-pixel2_t rev_lut[2][9] = {
+const pixel2_t rev_lut[2][9] = {
     {
         {0, 0},{1, 0},{2, 0},
         {2, 1},{2, 2},{1, 2},
