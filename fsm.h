@@ -16,7 +16,7 @@ extern "C" {
 #include "config.h"
 // #include <stdbool.h>
 
-#define PUSHED 0
+#define PUSHED 1
 
 
 bool led_covered;
